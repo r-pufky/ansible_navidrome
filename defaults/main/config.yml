@@ -5,7 +5,11 @@
 
 # Default music library location.
 #
-# Read-only music locations are valid.
+# Special Case:
+# * Location may be read-only but must be set to navidrome:navidrome 00755 -
+#   otherwise role will attempt to change it and fail.
+# * This is the 'default' library for all users (legacy). Additional libraries
+#   are added via the WebUI.
 #
 # Default: '/data/navidrome/music'.
 navidrome_cfg_music_folder: '/data/navidrome/music'
