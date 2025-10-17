@@ -1,0 +1,14 @@
+---
+###############################################################################
+# Navidrome Role Templates
+###############################################################################
+# Default dictionary templates are used as a base dictionary with user settings
+# merged into them to provide a known good dictionary of settings with defaults
+# if user has not specified all values.
+#
+# These should only be changed if new values are added to the config.
+
+# Template default values for navidrome_cfg_jukebox_devices
+navidrome_role_template_jukebox_devices:
+  name: ''
+  device: ''

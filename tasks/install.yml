@@ -1,0 +1,37 @@
+---
+###############################################################################
+# Install Packages & Services
+###############################################################################
+# Reference:
+# * https://github.com/navidrome/navidrome/releases
+
+- name: 'Install | packages'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.apt'
+  vars:
+    apt_packages:
+      - '{{ navidrome_role_packages }}'
+    apt_package_update_cache: true
+
+- name: 'Install | download 🗘'
+  ansible.builtin.debug:
+    msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │    Navidrome is being installed. This will take a few minutes.    │
+      │                                                                   │
+      ╰───────────────────────────────────────────────────────────────────╯
+
+- name: 'Install | navidrome {{ _navidrome_srv_version.raw }}'
+  ansible.builtin.apt:
+    deb: '{{ _navidrome_srv_version._url }}'
+    install_recommends: true
+    state: 'present'
+
+- name: 'Prep | stop services'
+  ansible.builtin.systemd:
+    name: '{{ item }}'
+    state: 'stopped'
+  failed_when: false
+  loop:
+    - 'navidrome.service'

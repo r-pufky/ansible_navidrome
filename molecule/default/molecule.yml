@@ -1,0 +1,67 @@
+---
+###############################################################################
+# Default
+###############################################################################
+# Default configuration is deployed successfully.
+#
+# Tests:
+# * Navidrome running (will not start with invalid config).
+# * Configuration (user_data) correct.
+
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    host_vars:
+      navidrome-debian-13-default:
+        navidrome_srv_user_data_manage_enable: false
+platforms:
+  - name: 'navidrome-debian-13-default'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
+    systemd: 'always'
+    capabilities:
+      - 'SYS_ADMIN'  # Required for systemd hardening.
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+    published_ports:
+      - '4533:4533/tcp'
+  - name: 'navidrome-debian-13-user_data'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
+    systemd: 'always'
+    capabilities:
+      - 'SYS_ADMIN'  # Required for systemd hardening.
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # Files created, extracted, created, deleted.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

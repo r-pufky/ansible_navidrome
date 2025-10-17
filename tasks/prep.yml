@@ -1,0 +1,54 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Prep
+###############################################################################
+# Create user if needed and determine UID/GID for potential remote filesystems.
+
+- name: 'Prep | fatal version mis-match'
+  when: >
+    _navidrome_srv_version_fatal_enable.raw and
+    _navidrome_srv_version.raw != navidrome_role_validate_version
+  ansible.builtin.fail:
+    msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │                     Fatal version mis-match.                      │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Navidrome version changes typically require manual migration steps
+      │ listed in release notes.
+      │
+      │ Reference:
+      │ * https://github.com/navidrome/navidrome/releases/tag/{{ _navidrome_srv_version.raw }}
+      │
+      │ navidrome_srv_version: {{ _navidrome_srv_version.raw }}
+      │ Supported version: {{ navidrome_role_validate_version }}
+      │ navidrome_srv_version_fatal_enable: {{ _navidrome_srv_version_fatal_enable.raw }}
+
+- name: 'Prep | manage users'
+  when: _navidrome_srv_create_user.raw
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.users'
+    tasks_from: 'role_account_add.yml'
+  vars:
+    users_role_user: '{{ navidrome_role_user }}'
+    users_role_group: '{{ navidrome_role_group }}'
+
+- name: 'Prep | enumerate system user {{ _navidrome_srv_user.raw }}'
+  ansible.builtin.user:
+    name: '{{ _navidrome_srv_user.raw }}'
+  check_mode: true
+  changed_when: false
+  register: _navidrome_srv_user_query
+
+- name: 'Prep | parse system user UID/GID'
+  ansible.builtin.set_fact:
+    _navidrome_srv_user: '{{
+        _navidrome_srv_user |
+        combine({"_uid": _navidrome_srv_user_query.uid})
+      }}'
+    _navidrome_srv_group: '{{
+        _navidrome_srv_group |
+        combine({"_gid": _navidrome_srv_user_query.group})
+      }}'

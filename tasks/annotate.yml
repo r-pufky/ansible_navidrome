@@ -1,0 +1,1204 @@
+---
+# yamllint disable rule:line-length
+###############################################################################
+# Annotate User Configuration.
+###############################################################################
+# Use r_pufky.data.v3 data annotations to enforce consistency and validation
+# checks.
+#
+# Generates:
+#   _navidrome_map: list of dict - Annotated config map.
+#   _navidrome_order: list of str - Config section order.
+#
+# Reference:
+# * https://docs.ansible.com/ansible/latest/dev_guide/developing_program_flow_modules.html#argument-spec
+# * https://github.com/ansible/ansible/issues/77159
+# yamllint enable rule:line-length
+
+- name: 'Annotate | sanitize & annotate service defaults'
+  ansible.builtin.set_fact:  # noqa jinja[spacing] readability.
+    _navidrome_srv_version: "{{ {} | r_pufky.data.v3(
+        raw=navidrome_srv_version,
+        default=navidrome_role_validate_version,
+        _bare=navidrome_srv_version.split('v')[-1],
+        _url=(
+          'https://github.com/navidrome/navidrome/releases/download/' ~
+          navidrome_srv_version ~
+          '/navidrome_' ~
+          navidrome_srv_version.split('v')[-1] ~
+          '_linux_amd64.deb'
+        ),
+        hint='str',
+        order=1
+        )
+      }}"
+    _navidrome_srv_version_fatal_enable: "{{ {} | r_pufky.data.v3(
+        raw=navidrome_srv_version_fatal_enable,
+        default=true,
+        hint='bool',
+        order=2
+        )
+      }}"
+    _navidrome_srv_user: "{{ {} | r_pufky.data.v3(
+        raw=navidrome_srv_user,
+        default='navidrome',
+        _uid='',
+        hint='str',
+        order=4
+        )
+      }}"
+    _navidrome_srv_group: "{{ {} | r_pufky.data.v3(
+        raw=navidrome_srv_group,
+        default='navidrome',
+        _gid='',
+        hint='str',
+        order=5
+        )
+      }}"
+    _navidrome_srv_create_user: "{{ {} | r_pufky.data.v3(
+        raw=navidrome_srv_create_user,
+        default=true,
+        hint='bool',
+        order=6
+        )
+      }}"
+    _navidrome_srv_user_data_manage_enable: "{{ {} | r_pufky.data.v3(
+        raw=navidrome_srv_user_data_manage_enable,
+        default=true,
+        hint='bool',
+        order=7
+        )
+      }}"
+
+- name: 'Annotate | sanitize & annotate config defaults'
+  ansible.builtin.set_fact:  # noqa jinja[spacing] readability.
+    _navidrome_cfg_music_folder: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='MusicFolder',
+        raw=navidrome_cfg_music_folder,
+        default='/data/navidrome/music',
+        hint='str',
+        keep=true,
+        order=1
+        )
+      }}"
+    _navidrome_cfg_data_folder: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='DataFolder',
+        raw=navidrome_cfg_data_folder | regex_replace('\\/$', ''),
+        default='/data/navidrome/data',
+        hint='str',
+        keep=true,
+        order=2
+        )
+      }}"
+    _navidrome_cfg_cache_folder: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='CacheFolder',
+        raw=navidrome_cfg_cache_folder,
+        default='/var/lib/navidrome/cache',
+        hint='str',
+        keep=true,
+        order=3
+        )
+      }}"
+    _navidrome_cfg_log_level: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='LogLevel',
+        raw=navidrome_cfg_log_level | lower,
+        default='info',
+        hint='str',
+        keep=false,
+        order=4
+        )
+      }}"
+    _navidrome_cfg_log_file: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='LogFile',
+        raw=navidrome_cfg_log_file,
+        default='',
+        hint='str',
+        keep=false,
+        order=5
+        )
+      }}"
+    _navidrome_cfg_address: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='Address',
+        raw=navidrome_cfg_address,
+        default='',
+        hint='str',
+        keep=false,
+        order=6
+        )
+      }}"
+    _navidrome_cfg_base_url: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='BaseUrl',
+        raw=navidrome_cfg_base_url,
+        default='',
+        hint='str',
+        keep=false,
+        order=7
+        )
+      }}"
+    _navidrome_cfg_port: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='Port',
+        raw=navidrome_cfg_port,
+        default=4533,
+        hint='int',
+        keep=false,
+        order=8
+        )
+      }}"
+    _navidrome_cfg_enable_insights_collector: "{{ {} | r_pufky.data.v3(
+        section='basic',
+        key='EnableInsightsCollector',
+        raw=navidrome_cfg_enable_insights_collector,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=9
+        )
+      }}"
+    _navidrome_cfg_agents: "{{ {} | r_pufky.data.v3(
+        section='advanced',
+        key='Agents',
+        raw=navidrome_cfg_agents,
+        data=navidrome_cfg_agents | join(','),
+        default=['lastfm', 'spotify', 'deezer'],
+        hint='list of str',
+        keep=false,
+        order=1
+        )
+      }}"
+    _navidrome_cfg_album_play_count_mode: "{{ {} | r_pufky.data.v3(
+        section='advanced',
+        key='AlbumPlayCountMode',
+        raw=navidrome_cfg_album_play_count_mode,
+        default='absolute',
+        hint='str',
+        keep=false,
+        order=2
+        )
+      }}"
+    _navidrome_cfg_auth_request_limit: "{{ {} | r_pufky.data.v3(
+        section='advanced',
+        key='AuthRequestLimit',
+        raw=navidrome_cfg_auth_request_limit,
+        default=5,
+        hint='int',
+        keep=false,
+        order=3
+        )
+      }}"
+    _navidrome_cfg_auth_window_length: "{{ {} | r_pufky.data.v3(
+        section='advanced',
+        key='AuthWindowLength',
+        raw=navidrome_cfg_auth_window_length,
+        default='20s',
+        hint='str',
+        keep=false,
+        order=4
+        )
+      }}"
+    _navidrome_cfg_auto_import_playlists: "{{ {} | r_pufky.data.v3(
+        section='advanced',
+        key='AutoImportPlaylists',
+        raw=navidrome_cfg_auto_import_playlists,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=5
+        )
+      }}"
+    _navidrome_cfg_auto_transcode_download: "{{ {} | r_pufky.data.v3(
+        section='advanced',
+        key='AutoTranscodeDownload',
+        raw=navidrome_cfg_auto_transcode_download,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=6
+        )
+      }}"
+    _navidrome_cfg_default_playlist_public_visibility: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultPlaylistPublicVisibility',
+        raw=navidrome_cfg_default_playlist_public_visibility,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=7
+        )
+      }}"
+    _navidrome_cfg_artist_art_priority: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ArtistArtPriority',
+        raw=navidrome_cfg_artist_art_priority,
+        data=navidrome_cfg_artist_art_priority | join(','),
+        default=['artist.*', 'album/artist.*', 'external'],
+        hint='list of str',
+        keep=false,
+        order=8
+        )
+      }}"
+    _navidrome_cfg_backup_path: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Backup.Path',
+        raw=navidrome_cfg_backup_path | regex_replace('\\/$', ''),
+        default='',
+        hint='str',
+        keep=false,
+        order=9
+        )
+      }}"
+    _navidrome_cfg_backup_schedule: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Backup.Schedule',
+        raw=navidrome_cfg_backup_schedule,
+        default='',
+        hint='str',
+        keep=false,
+        order=10
+        )
+      }}"
+    _navidrome_cfg_backup_count: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Backup.Count',
+        raw=navidrome_cfg_backup_count,
+        default=0,
+        hint='int',
+        keep=false,
+        order=11
+        )
+      }}"
+    _navidrome_cfg_cover_art_priority: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='CoverArtPriority',
+        raw=navidrome_cfg_cover_art_priority,
+        data=navidrome_cfg_cover_art_priority | join(','),
+        default=['cover.*', 'folder.*', 'front.*', 'embedded', 'external'],
+        hint='list of str',
+        keep=false,
+        order=12
+        )
+      }}"
+    _navidrome_cfg_cover_jpeg_quality: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='CoverJpegQuality',
+        raw=navidrome_cfg_cover_jpeg_quality,
+        default=75,
+        hint='int',
+        keep=false,
+        order=13
+        )
+      }}"
+    _navidrome_cfg_deezer_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Deezer.Enabled',
+        raw=navidrome_cfg_deezer_enabled,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=14
+        )
+      }}"
+    _navidrome_cfg_default_downsampling_format: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultDownsamplingFormat',
+        raw=navidrome_cfg_default_downsampling_format,
+        default='opus',
+        hint='str',
+        keep=false,
+        order=15
+        )
+      }}"
+    _navidrome_cfg_default_language: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultLanguage',
+        raw=navidrome_cfg_default_language,
+        default='en',
+        hint='str',
+        keep=false,
+        order=16
+        )
+      }}"
+    _navidrome_cfg_default_theme: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultTheme',
+        raw=navidrome_cfg_default_theme,
+        default='Dark',
+        hint='str',
+        keep=false,
+        order=17
+        )
+      }}"
+    _navidrome_cfg_default_share_expiration: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultShareExpiration',
+        raw=navidrome_cfg_default_share_expiration,
+        default='8760h',
+        hint='str',
+        keep=false,
+        order=18
+        )
+      }}"
+    _navidrome_cfg_default_downloadable_share: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultDownloadableShare',
+        raw=navidrome_cfg_default_downloadable_share,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=19
+        )
+      }}"
+    _navidrome_cfg_default_ui_volume: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='DefaultUIVolume',
+        raw=navidrome_cfg_default_ui_volume,
+        default=100,
+        hint='int',
+        keep=false,
+        order=20
+        )
+      }}"
+    _navidrome_cfg_enable_artwork_precache: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableArtworkPrecache',
+        raw=navidrome_cfg_enable_artwork_precache,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=21
+        )
+      }}"
+    _navidrome_cfg_enable_cover_animation: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableCoverAnimation',
+        raw=navidrome_cfg_enable_cover_animation,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=22
+        )
+      }}"
+    _navidrome_cfg_enable_downloads: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableDownloads',
+        raw=navidrome_cfg_enable_downloads,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=23
+        )
+      }}"
+    _navidrome_cfg_enable_external_services: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableExternalServices',
+        raw=navidrome_cfg_enable_external_services,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=24
+        )
+      }}"
+    _navidrome_cfg_enable_favourites: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableFavourites',
+        raw=navidrome_cfg_enable_favourites,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=25
+        )
+      }}"
+    _navidrome_cfg_enable_gravatar: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableGravatar',
+        raw=navidrome_cfg_enable_gravatar,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=26
+        )
+      }}"
+    _navidrome_cfg_enable_log_redacting: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableLogRedacting',
+        raw=navidrome_cfg_enable_log_redacting,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=27
+        )
+      }}"
+    _navidrome_cfg_enable_media_file_cover_art: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableMediaFileCoverArt',
+        raw=navidrome_cfg_enable_media_file_cover_art,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=28
+        )
+      }}"
+    _navidrome_cfg_enable_now_playing: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableNowPlaying',
+        raw=navidrome_cfg_enable_now_playing,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=29
+        )
+      }}"
+    _navidrome_cfg_enable_replay_gain: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableReplayGain',
+        raw=navidrome_cfg_enable_replay_gain,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=30
+        )
+      }}"
+    _navidrome_cfg_enable_sharing: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableSharing',
+        raw=navidrome_cfg_enable_sharing,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=31
+        )
+      }}"
+    _navidrome_cfg_enable_star_rating: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableStarRating',
+        raw=navidrome_cfg_enable_star_rating,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=32
+        )
+      }}"
+    _navidrome_cfg_enable_transcoding_config: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableTranscodingConfig',
+        raw=navidrome_cfg_enable_transcoding_config,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=33
+        )
+      }}"
+    _navidrome_cfg_enable_user_editing: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='EnableUserEditing',
+        raw=navidrome_cfg_enable_user_editing,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=34
+        )
+      }}"
+    _navidrome_cfg_ffmpeg_path: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='FFmpegPath',
+        raw=navidrome_cfg_ffmpeg_path,
+        default='',
+        hint='str',
+        keep=false,
+        order=35
+        )
+      }}"
+    _navidrome_cfg_ga_tracking_id: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='GATrackingID',
+        raw=navidrome_cfg_ga_tracking_id,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=36
+        )
+      }}"
+    _navidrome_cfg_http_security_headers_custom_frame_options_value: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='HTTPSecurityHeaders.CustomFrameOptionsValue',
+        raw=navidrome_cfg_http_security_headers_custom_frame_options_value,
+        default='',
+        hint='str',
+        keep=false,
+        order=37
+        )
+      }}"
+    _navidrome_cfg_ignored_articles: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='IgnoredArticles',
+        raw=navidrome_cfg_ignored_articles,
+        data=navidrome_cfg_ignored_articles | join(' '),
+        default=(
+          ['The', 'El', 'La', 'Los', 'Las', 'Le', 'Les', 'Os', 'As', 'O', 'A']
+        ),
+        hint='list of str',
+        keep=false,
+        order=38
+        )
+      }}"
+    _navidrome_cfg_image_cache_size: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ImageCacheSize',
+        raw=navidrome_cfg_image_cache_size,
+        default='100MB',
+        hint='str',
+        keep=false,
+        order=39
+        )
+      }}"
+    _navidrome_cfg_jukebox_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Jukebox.Enabled',
+        raw=navidrome_cfg_jukebox_enabled,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=40
+        )
+      }}"
+    _navidrome_cfg_jukebox_admin_only: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Jukebox.AdminOnly',
+        raw=navidrome_cfg_jukebox_admin_only,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=41
+        )
+      }}"
+    # TODO - ensure rendered properly. Add comment.
+    _navidrome_cfg_jukebox_devices: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Jukebox.Devices',
+        raw=navidrome_cfg_jukebox_devices,
+        data=[],
+        default=[],
+        hint='list of dict',
+        keep=false,
+        order=42
+        )
+      }}"
+    _navidrome_cfg_jukebox_default: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Jukebox.Default',
+        raw=navidrome_cfg_jukebox_default,
+        default='',
+        hint='str',
+        keep=false,
+        order=43
+        )
+      }}"
+    _navidrome_cfg_last_fm_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='LastFM.Enabled',
+        raw=navidrome_cfg_last_fm_enabled,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=44
+        )
+      }}"
+    _navidrome_cfg_last_fm_api_key: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='LastFM.ApiKey',
+        raw=navidrome_cfg_last_fm_api_key,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=45
+        )
+      }}"
+    _navidrome_cfg_last_fm_secret: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='LastFM.Secret',
+        raw=navidrome_cfg_last_fm_secret,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=46
+        )
+      }}"
+    _navidrome_cfg_last_fm_language: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='LastFM.Language',
+        raw=navidrome_cfg_last_fm_language,
+        default='en',
+        hint='str',
+        keep=false,
+        order=47
+        )
+      }}"
+    _navidrome_cfg_last_fm_scrobble_first_artist_only: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='LastFM.ScrobbleFirstArtistOnly',
+        raw=navidrome_cfg_last_fm_scrobble_first_artist_only,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=48
+        )
+      }}"
+    _navidrome_cfg_listen_brainz_base_url: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ListenBrainz.BaseURL',
+        raw=navidrome_cfg_listen_brainz_base_url,
+        default='https://api.listenbrainz.org/1/',
+        hint='str',
+        keep=false,
+        order=49
+        )
+      }}"
+    _navidrome_cfg_listen_brainz_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ListenBrainz.Enabled',
+        raw=navidrome_cfg_listen_brainz_enabled,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=50
+        )
+      }}"
+    _navidrome_cfg_lyrics_priority: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='LyricsPriority',
+        raw=navidrome_cfg_lyrics_priority,
+        data=navidrome_cfg_lyrics_priority | join(','),
+        default=['.lrc', '.txt', 'embedded'],
+        hint='list of str',
+        keep=false,
+        order=51
+        )
+      }}"
+    _navidrome_cfg_max_sidebar_playlists: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='MaxSidebarPlaylists',
+        raw=navidrome_cfg_max_sidebar_playlists,
+        default=100,
+        hint='int',
+        keep=false,
+        order=52
+        )
+      }}"
+    _navidrome_cfg_mpv_path: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='MPVPath',
+        raw=navidrome_cfg_mpv_path,
+        default='',
+        hint='str',
+        keep=false,
+        order=53
+        )
+      }}"
+    _navidrome_cfg_mpv_cmd_template: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='MPVCmdTemplate',
+        raw=navidrome_cfg_mpv_cmd_template,
+        default=(
+          'mpv --audio-device=%d --no-audio-display --pause ' ~
+          '%f --input-ipc-server=%s'
+        ),
+        hint='str',
+        keep=false,
+        order=54
+        )
+      }}"
+    _navidrome_cfg_password_encryption_key: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='PasswordEncryptionKey',
+        raw=navidrome_cfg_password_encryption_key,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=55
+        )
+      }}"
+    _navidrome_cfg_pid_album: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='PID.Album',
+        raw=navidrome_cfg_pid_album,
+        data=navidrome_cfg_pid_album | join(','),
+        default=[
+          'musicbrainz_albumid|albumartistid',
+          'album',
+          'albumversion',
+          'releasedate'
+        ],
+        hint='list of str',
+        keep=false,
+        order=56
+        )
+      }}"
+    _navidrome_cfg_pid_track: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='PID.Track',
+        raw=navidrome_cfg_pid_track,
+        data=navidrome_cfg_pid_track | join(','),
+        default=[
+          'musicbrainz_trackid|albumid',
+          'discnumber',
+          'tracknumber',
+          'title'
+        ],
+        hint='list of str',
+        keep=false,
+        order=57
+        )
+      }}"
+    _navidrome_cfg_playlists_path: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='PlaylistsPath',
+        raw=navidrome_cfg_playlists_path,
+        data=navidrome_cfg_playlists_path | join(':'),
+        default=[],
+        hint='list of str',
+        keep=false,
+        order=58
+        )
+      }}"
+    _navidrome_cfg_prefer_sort_tags: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='PreferSortTags',
+        raw=navidrome_cfg_prefer_sort_tags,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=59
+        )
+      }}"
+    _navidrome_cfg_prometheus_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Prometheus.Enabled',
+        raw=navidrome_cfg_prometheus_enabled,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=60
+        )
+      }}"
+    _navidrome_cfg_prometheus_metrics_path: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Prometheus.MetricsPath',
+        raw=navidrome_cfg_prometheus_metrics_path,
+        default='/metrics',
+        hint='str',
+        keep=false,
+        order=61
+        )
+      }}"
+    _navidrome_cfg_prometheus_password: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Prometheus.Password',
+        raw=navidrome_cfg_prometheus_password,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=62
+        )
+      }}"
+    _navidrome_cfg_recently_added_by_mod_time: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='RecentlyAddedByModTime',
+        raw=navidrome_cfg_recently_added_by_mod_time,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=63
+        )
+      }}"
+    _navidrome_cfg_reverse_proxy_user_header: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ReverseProxyUserHeader',
+        raw=navidrome_cfg_reverse_proxy_user_header,
+        default='Remote-User',
+        hint='str',
+        keep=false,
+        order=64
+        )
+      }}"
+    _navidrome_cfg_reverse_proxy_whitelist: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ReverseProxyWhitelist',
+        raw=navidrome_cfg_reverse_proxy_whitelist,
+        data=navidrome_cfg_reverse_proxy_whitelist | join(','),
+        default=[],
+        hint='list of str',
+        keep=false,
+        order=65
+        )
+      }}"
+    _navidrome_cfg_scanner_enabled: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.Enabled',
+        raw=navidrome_cfg_scanner_enabled,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=66
+        )
+      }}"
+    _navidrome_cfg_scanner_schedule: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.Schedule',
+        raw=navidrome_cfg_scanner_schedule,
+        default='0',
+        hint='str',
+        keep=false,
+        order=67
+        )
+      }}"
+    _navidrome_cfg_scanner_watcher_wait: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.WatcherWait',
+        raw=navidrome_cfg_scanner_watcher_wait,
+        default='5s',
+        hint='str',
+        keep=false,
+        order=68
+        )
+      }}"
+    _navidrome_cfg_scanner_scan_on_startup: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.ScanOnStartup',
+        raw=navidrome_cfg_scanner_scan_on_startup,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=69
+        )
+      }}"
+    _navidrome_cfg_scanner_artist_joiner: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.ArtistJoiner',
+        raw=navidrome_cfg_scanner_artist_joiner,
+        default=' • ',
+        hint='str',
+        keep=false,
+        order=70
+        )
+      }}"
+    _navidrome_cfg_scanner_follow_symlinks: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.FollowSymlinks',
+        raw=navidrome_cfg_scanner_follow_symlinks,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=71
+        )
+      }}"
+    _navidrome_cfg_scanner_purge_missing: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Scanner.PurgeMissing',
+        raw=navidrome_cfg_scanner_purge_missing | lower,
+        default='never',
+        hint='str',
+        keep=false,
+        order=72
+        )
+      }}"
+    _navidrome_cfg_search_full_string: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='SearchFullString',
+        raw=navidrome_cfg_search_full_string,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=73
+        )
+      }}"
+    _navidrome_cfg_session_timeout: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='SessionTimeout',
+        raw=navidrome_cfg_session_timeout,
+        default='48h',
+        hint='str',
+        keep=false,
+        order=74
+        )
+      }}"
+    _navidrome_cfg_share_url: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='ShareURL',
+        raw=navidrome_cfg_share_url,
+        default='',
+        hint='str',
+        keep=false,
+        order=75
+        )
+      }}"
+    _navidrome_cfg_smart_playlist_refresh_delay: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='SmartPlaylistRefreshDelay',
+        raw=navidrome_cfg_smart_playlist_refresh_delay,
+        default='5s',
+        hint='str',
+        keep=false,
+        order=76
+        )
+      }}"
+    _navidrome_cfg_spotify_id: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Spotify.ID',
+        raw=navidrome_cfg_spotify_id,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=77
+        )
+      }}"
+    _navidrome_cfg_spotify_secret: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Spotify.Secret',
+        raw=navidrome_cfg_spotify_secret,
+        default='',
+        hint='str',
+        sensitive=true,
+        keep=false,
+        order=78
+        )
+      }}"
+    _navidrome_cfg_subsonic_append_subtitle: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Subsonic.AppendSubtitle',
+        raw=navidrome_cfg_subsonic_append_subtitle,
+        default=true,
+        hint='bool',
+        keep=false,
+        order=79
+        )
+      }}"
+    _navidrome_cfg_subsonic_artist_participations: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Subsonic.ArtistParticipations',
+        raw=navidrome_cfg_subsonic_artist_participations,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=80
+        )
+      }}"
+    _navidrome_cfg_subsonic_default_report_real_path: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Subsonic.DefaultReportRealPath',
+        raw=navidrome_cfg_subsonic_default_report_real_path,
+        default=false,
+        hint='bool',
+        keep=false,
+        order=81
+        )
+      }}"
+    _navidrome_cfg_subsonic_legacy_clients: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Subsonic.LegacyClients',
+        raw=navidrome_cfg_subsonic_legacy_clients,
+        data=navidrome_cfg_subsonic_legacy_clients | join(','),
+        default=['DSub'],
+        hint='list of str',
+        keep=false,
+        order=82
+        )
+      }}"
+    _navidrome_cfg_tags: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='Tags',
+        raw=navidrome_cfg_tags,
+        data=navidrome_cfg_tags | join('\n'),
+        default=[],
+        hint='list of str',
+        keep=false,
+        order=83
+        )
+      }}"
+    _navidrome_cfg_tls_cert: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='TLSCert',
+        raw=navidrome_cfg_tls_cert,
+        default='',
+        _src=navidrome_cfg_tls_cert | regex_replace('\\/$', ''),
+        _dest=(
+          navidrome_cfg_data_folder | regex_replace('\\/$', '') ~
+          '/tls.cert'
+        ),
+        hint='str',
+        keep=false,
+        order=84
+        )
+      }}"
+    _navidrome_cfg_tls_key: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='TLSKey',
+        raw=navidrome_cfg_tls_key,
+        default='',
+        _src=navidrome_cfg_tls_key | regex_replace('\\/$', ''),
+        _dest=(
+          navidrome_cfg_data_folder | regex_replace('\\/$', '') ~
+          '/tls.key'
+        ),
+        hint='str',
+        keep=false,
+        order=85
+        )
+      }}"
+    _navidrome_cfg_transcoding_cache_size: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='TranscodingCacheSize',
+        raw=navidrome_cfg_transcoding_cache_size,
+        default='100MB',
+        hint='str',
+        keep=false,
+        order=86
+        )
+      }}"
+    _navidrome_cfg_ui_login_background_url: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='UILoginBackgroundUrl',
+        raw=navidrome_cfg_ui_login_background_url,
+        default='',
+        hint='str',
+        keep=false,
+        order=87
+        )
+      }}"
+    _navidrome_cfg_ui_welcome_message: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='UIWelcomeMessage',
+        raw=navidrome_cfg_ui_welcome_message,
+        default='',
+        hint='str',
+        keep=false,
+        order=88
+        )
+      }}"
+    _navidrome_cfg_unix_socket_perm: "{{
+      {} | r_pufky.data.v3(
+        section='advanced',
+        key='UnixSocketPerm',
+        raw=navidrome_cfg_unix_socket_perm,
+        default='0660',
+        hint='str',
+        keep=false,
+        order=89
+        )
+      }}"
+
+- name: 'Annotate | normalize navidrome_cfg_jukebox_devices'
+  ansible.builtin.set_fact:
+    _navidrome_cfg_jukebox_devices: '{{
+        _navidrome_cfg_jukebox_devices |
+        combine({"data": _navidrome_cfg_jukebox_devices.data | default([]) +
+              [(navidrome_role_template_jukebox_devices |
+                combine(item)).values() | list]})
+      }}'
+  loop: '{{ _navidrome_cfg_jukebox_devices.raw }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: 'Annotate | generate config map'
+  ansible.builtin.set_fact:
+    _navidrome_map: '{{
+        hostvars[inventory_hostname] | dict2items |
+        selectattr("key", "match", "_navidrome_cfg_*")
+      }}'
+    _navidrome_order:
+      - 'basic'
+      - 'advanced'

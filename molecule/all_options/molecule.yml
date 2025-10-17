@@ -1,0 +1,164 @@
+---
+###############################################################################
+# Default
+###############################################################################
+# Default configuration is deployed successfully.
+#
+# Tests:
+# * Navidrome running (will not start with invalid config).
+# * All non-default options render correctly (user_data).
+
+dependency:
+  name: 'galaxy'
+driver:
+  name: 'podman'
+provisioner:
+  name: 'ansible'
+  config_options:
+    defaults:
+      interpreter_python: 'auto_silent'
+      callback_whitelist: 'profile_tasks, timer, yaml'
+    ssh_connection:
+      pipelining: false
+  inventory:
+    group_vars:
+      all:
+        navidrome_cfg_log_level: 'error'
+        navidrome_cfg_log_file: '/tmp/navidrome.log'
+        navidrome_cfg_address: '0.0.0.0'
+        navidrome_cfg_base_url: '/'
+        navidrome_cfg_port: 4534
+        navidrome_cfg_enable_insights_collector: true
+        navidrome_cfg_agents: ['lastfm']
+        navidrome_cfg_album_play_count_mode: 'normalized'
+        navidrome_cfg_auth_request_limit: 0
+        navidrome_cfg_auth_window_length: '10s'
+        navidrome_cfg_auto_import_playlists: false
+        navidrome_cfg_auto_transcode_download: true
+        navidrome_cfg_default_playlist_public_visibility: true
+        navidrome_cfg_artist_art_priority: ['artist.*']
+        navidrome_cfg_backup_path: '/data/navidrome/backup'
+        navidrome_cfg_backup_schedule: '@weekly'
+        navidrome_cfg_backup_count: 3
+        navidrome_cfg_cover_art_priority: ['cover.*']
+        navidrome_cfg_cover_jpeg_quality: 100
+        navidrome_cfg_deezer_enabled: false
+        navidrome_cfg_default_downsampling_format: 'mp3'
+        navidrome_cfg_default_language: 'es'
+        navidrome_cfg_default_theme: 'Green'
+        navidrome_cfg_default_share_expiration: '24h'
+        navidrome_cfg_default_downloadable_share: true
+        navidrome_cfg_default_ui_volume: 50
+        navidrome_cfg_enable_artwork_precache: false
+        navidrome_cfg_enable_cover_animation: false
+        navidrome_cfg_enable_downloads: false
+        navidrome_cfg_enable_external_services: false
+        navidrome_cfg_enable_favourites: false
+        navidrome_cfg_enable_gravatar: true
+        navidrome_cfg_enable_log_redacting: false
+        navidrome_cfg_enable_media_file_cover_art: false
+        navidrome_cfg_enable_now_playing: false
+        navidrome_cfg_enable_replay_gain: false
+        navidrome_cfg_enable_sharing: true
+        navidrome_cfg_enable_star_rating: false
+        navidrome_cfg_enable_transcoding_config: true
+        navidrome_cfg_enable_user_editing: false
+        navidrome_cfg_ffmpeg_path: '/usr/bin/ffmpeg'
+        navidrome_cfg_ga_tracking_id: 'UA-123456789'
+        navidrome_cfg_http_security_headers_custom_frame_options_value: 'test'
+        navidrome_cfg_ignored_articles: ['The']
+        navidrome_cfg_image_cache_size: '10MB'
+        navidrome_cfg_jukebox_enabled: true
+        navidrome_cfg_jukebox_admin_only: false
+        navidrome_cfg_jukebox_devices:
+          - name: 'internal'
+            device: 'coreaudio/BuiltInSpeakerDevice'
+        navidrome_cfg_jukebox_default: 'internal'
+        navidrome_cfg_last_fm_enabled: false
+        navidrome_cfg_last_fm_api_key: 'test'
+        navidrome_cfg_last_fm_secret: 'test'
+        navidrome_cfg_last_fm_language: 'es'
+        navidrome_cfg_last_fm_scrobble_first_artist_only: true
+        navidrome_cfg_listen_brainz_base_url: 'https://api.listenbrainz.org/2/'
+        navidrome_cfg_listen_brainz_enabled: false
+        navidrome_cfg_lyrics_priority: ['.lrc']
+        navidrome_cfg_max_sidebar_playlists: 10
+        navidrome_cfg_mpv_path: '/usr/bin/mpv'
+        navidrome_cfg_mpv_cmd_template: 'mpv --no-audio-display'
+        navidrome_cfg_password_encryption_key: 'test'
+        navidrome_cfg_pid_album: ['musicbrainz_albumid|albumartistid']
+        navidrome_cfg_pid_track: ['musicbrainz_trackid|albumid']
+        navidrome_cfg_playlists_path: ['playlists']
+        navidrome_cfg_prefer_sort_tags: true
+        navidrome_cfg_prometheus_enabled: true
+        navidrome_cfg_prometheus_metrics_path: '/metrics_test'
+        navidrome_cfg_prometheus_password: 'test'
+        navidrome_cfg_recently_added_by_mod_time: true
+        navidrome_cfg_reverse_proxy_user_header: 'Remote'
+        navidrome_cfg_reverse_proxy_whitelist: ['0.0.0.0']
+        navidrome_cfg_scanner_enabled: false
+        navidrome_cfg_scanner_schedule: '@weekly'
+        navidrome_cfg_scanner_watcher_wait: '4s'
+        navidrome_cfg_scanner_scan_on_startup: false
+        navidrome_cfg_scanner_artist_joiner: ' - '
+        navidrome_cfg_scanner_follow_symlinks: false
+        navidrome_cfg_scanner_purge_missing: 'full'
+        navidrome_cfg_search_full_string: true
+        navidrome_cfg_session_timeout: '24h'
+        navidrome_cfg_share_url: '/'
+        navidrome_cfg_smart_playlist_refresh_delay: '4s'
+        navidrome_cfg_spotify_id: 'test'
+        navidrome_cfg_spotify_secret: 'test'
+        navidrome_cfg_subsonic_append_subtitle: false
+        navidrome_cfg_subsonic_artist_participations: true
+        navidrome_cfg_subsonic_default_report_real_path: true
+        navidrome_cfg_subsonic_legacy_clients: ['DSub', 'test']
+        navidrome_cfg_tags:
+          - 'Tags.MyCustomTag.Aliases = ["mycustomtag", "customtag"]'
+          - 'Tags.MyCustomTag.MaxLength = 50'
+          - 'Tags.MyCustomTag.Album = false'
+          - 'Tags.MyCustomTag.Split = ["; ", " / "]'
+        # TODO - prep create TLS cert
+        navidrome_cfg_tls_cert: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/server-cert.pem"
+          }}'
+        navidrome_cfg_tls_key: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/cache/server-key.pem"
+          }}'
+        navidrome_cfg_transcoding_cache_size: '10MB'
+        navidrome_cfg_ui_login_background_url:
+          'http://navidrome.example.com/foo.jpg'
+        navidrome_cfg_ui_welcome_message: 'Hello'
+        navidrome_cfg_unix_socket_perm: '0664'
+platforms:
+  - name: 'navidrome-debian-13-all_options'
+    image: 'ghcr.io/hifis-net/debian-systemd:13'
+    systemd: 'always'
+    capabilities:
+      - 'SYS_ADMIN'  # Required for systemd hardening.
+    volumes:
+      - '/sys/fs/cgroup:/sys/fs/cgroup:ro'
+    command: '/lib/systemd/systemd'
+    pre_build_image: true
+verifier:
+  name: 'ansible'
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+scenario:
+  test_sequence:
+    # - 'dependency'
+    # - 'cleanup'
+    - 'destroy'
+    - 'syntax'
+    - 'create'
+    - 'prepare'
+    - 'converge'
+    # - 'idempotence'  # Files created, extracted, created, deleted.
+    # - 'side_effect'
+    - 'verify'
+    # - 'cleanup'
+    - 'destroy'

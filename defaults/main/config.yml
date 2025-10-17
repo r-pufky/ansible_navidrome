@@ -1,0 +1,746 @@
+---
+###############################################################################
+# Basic Configuration
+###############################################################################
+
+# Default music library location.
+#
+# Read-only music locations are valid.
+#
+# Default: '/data/navidrome/music'.
+navidrome_cfg_music_folder: '/data/navidrome/music'
+
+# Application data (DB) storage location. Default: '/data/navidrome/data'.
+navidrome_cfg_data_folder: '/data/navidrome/data'
+
+# Application caching (transcoding, images) data.
+#
+# Default: '/var/lib/navidrome/cache'.
+navidrome_cfg_cache_folder: '/var/lib/navidrome/cache'
+
+# Log level.
+#
+# Values:
+#   error: Errors only.
+#    warn: Errors + warnings.
+#    info: Warnings + informational messages (default).
+#   debug: Informational + debugging messages.
+#   trace: Debugging + stacktraces.
+#
+# Default: 'info'.
+navidrome_cfg_log_level: 'info'
+
+# Log file location.
+#
+# Values:
+#       '': Log to stderr (default).
+#   {PATH}: Log to specified file.
+#
+# Default: '' (stderr.)
+navidrome_cfg_log_file: ''
+
+# Interface server will bind to.
+#
+# Values:
+#            {IP}: IPv4/IPv6 address.
+#   'unix:{PATH}': Unix socket.
+#        	0.0.0.0: All IPv4.
+#            '::': All IPv6.
+#              '': All Interfaces (default).
+#
+# Default: '' (all interfaces).
+navidrome_cfg_address: ''
+
+# Base URL.
+#
+# Use for proxy configuration.
+#
+# Values:
+#   /{PATH}: URL subpath (e.g. /music).
+#     {URL}: URL (e.g. https://music.example.com)
+#
+# Default: '' (automatic).
+navidrome_cfg_base_url: ''
+
+# Port. Default: 4533.
+navidrome_cfg_port: 4533
+
+# Enable anonymous data collection? Default: False.
+navidrome_cfg_enable_insights_collector: false
+
+###############################################################################
+# Advanced Configuration
+###############################################################################
+#
+# Value Formats:
+#   TIME (time): A duration string is a possibly signed sequence of decimal
+#         numbers with unit suffix, such as '24h', '30s' or '1h10m'.
+#       Values:
+#         s: Seconds.
+#         m: Minutes.
+#         h: Hours.
+#   SIZE (size): Sizes are specified as a number and an optional unit suffix,
+#         such as '1GB' or '150 MiB'. Default unit is bytes.
+#       Values:
+#               #: Size in bytes (default).
+#         #{SIZE}: Size in unit (GB, MiB, etc).
+
+# List of metadata agents.
+#
+# Retrieves artist information, biographies, and images.
+#
+# Special Case:
+# * Order determines priority - agents tried in specified order success.
+#
+# Values:
+#   lastfm:
+#   spotify:
+#   deezer:
+#
+# Default:
+#   - 'lastfm'
+#   - 'spotify'
+#   - 'deezer'
+navidrome_cfg_agents:
+  - 'lastfm'
+  - 'spotify'
+  - 'deezer'
+
+# Play count mode
+#
+# Values:
+#   absolute: Total album play counts (default).
+#   normalized: Total album play counts / number of album tracks.
+#
+# Default: 'absolute'.
+navidrome_cfg_album_play_count_mode: 'absolute'
+
+# Number of auth requests allowed from a single IP per auth period.
+#
+# Values:
+#   0: Disabled.
+#   #: Number of auth attempts (navidrome_cfg_auth_window_length period).
+#
+# Default: 5.
+navidrome_cfg_auth_request_limit: 5
+
+# Period auth rate limiting (TIME). Default: '20s'.
+navidrome_cfg_auth_window_length: '20s'
+
+# Enable m3u playlist auto-import? Default: True.
+navidrome_cfg_auto_import_playlists: true
+
+# Use client transcoding configuration for downloads?
+#
+# Values:
+#    True: Use client configuration if format not specified.
+#   False: Use original format (transcoding disabled).
+#
+# Default: False.
+navidrome_cfg_auto_transcode_download: false
+
+# Set imported playlists as public by default? Default: False.
+navidrome_cfg_default_playlist_public_visibility: false
+
+# Order to look for artist images.
+#
+# Values:
+#     {FILE}: Filename to match (globbing allowed).
+#   external: External sources (last.fm, spotify, etc).
+#
+# Default:
+#   - 'artist.*'
+#   - 'album/artist.*'
+#   - 'external'
+navidrome_cfg_artist_art_priority:
+  - 'artist.*'
+  - 'album/artist.*'
+  - 'external'
+
+# Path to store backups.
+#
+# Values:
+#   {PATH}: Absolute path to backup location.
+#       '': Disable backups (default).
+#
+# Default: '' (disabled).
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/backup/
+navidrome_cfg_backup_path: ''
+
+# Schedule for automatic backups.
+#
+# Values:
+#   {CRON}: Cron syntax.
+#       '': Disabled (default).
+#
+# Default: '' (disabled).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+navidrome_cfg_backup_schedule: ''
+
+# Number of backups to keep (0 disables). Default: 0 (disabled).
+navidrome_cfg_backup_count: 0
+
+# Order to look for cover art images.
+#
+# Values:
+#     {FILE}: Filename to match (globbing allowed).
+#   embedded: Use embedded images in audio files.
+#   external: External sources (last.fm, spotify, etc).
+#
+# Default:
+#   - 'cover.*'
+#   - 'folder.*'
+#   - 'front.*'
+#   - 'embedded'
+#   - 'external'
+navidrome_cfg_cover_art_priority:
+  - 'cover.*'
+  - 'folder.*'
+  - 'front.*'
+  - 'embedded'
+  - 'external'
+
+# JPEG quality for resized cover art images (percentage). Default: 75.
+navidrome_cfg_cover_jpeg_quality: 75
+
+# Enable Deezer integration for artist images? Default: True.
+navidrome_cfg_deezer_enabled: true
+
+# Default downsampling format for client downsampling request. Default: 'opus'.
+navidrome_cfg_default_downsampling_format: 'opus'
+
+# Default language when logging in from a new browser.
+#
+# Special Case:
+# * Must match a value in reference link.
+#
+# Default: ''
+#
+# Reference:
+# * https://github.com/navidrome/navidrome/tree/master/resources/i18n
+navidrome_cfg_default_language: 'en'
+
+# Default material UI theme when logging in from a new browser.
+#
+# Values:
+#                     Auto: Auto select 'Light' or 'Dark' based on device.
+#                    Light: blue/white (light).
+#                     Dark: blue/dark grey (dark) (default).
+#   'Catppuccin Macchiato': light purple/dark gray (solar).
+#        'Electric Purple': Purple/Grey.
+#             'Extra Dark': Blue/black.
+#                    Green: Green/dark grey (gitea).
+#           'Gruvbox Dark': light tan/dark grey (sandstone).
+#                   Ligera: White/white.
+#                  Monokai: grey/dark grey (monokai).
+#                     Nord: Blue grey.
+#                  Nuclear: Green yellow/dark grey.
+#              Spotify-ish: Bright green/dark grey (spotify).
+#
+# Default: 'Dark'.
+#
+# Reference:
+# * https://mui.com/material-ui/customization/theming
+navidrome_cfg_default_theme: 'Dark'
+
+# Default expiration time for new shares (public links) (TIME).
+#
+# Default: '8760h' (1 year).
+navidrome_cfg_default_share_expiration: '8760h'
+
+# Default downloadable state for new shares (public links). Default: False.
+navidrome_cfg_default_downloadable_share: false
+
+# Default volume when logging in from a new browser (0-100). Default: 100.
+navidrome_cfg_default_ui_volume: 100
+
+# Enable image pre-caching of newly added music? Default: True.
+navidrome_cfg_enable_artwork_precache: true
+
+# Enable album cover animation (rotation)? Default: True.
+navidrome_cfg_enable_cover_animation: true
+
+# Enable downloads from server? Default: True.
+navidrome_cfg_enable_downloads: true
+
+# Enable external integrations?
+#
+# Special Case:
+# * Disabling will disable ALL external integrations, including anonymous data
+#   collection and nice login background images.
+#
+# Default: True.
+navidrome_cfg_enable_external_services: true
+
+# Enable toggling heart/loved in UI. Default: True.
+navidrome_cfg_enable_favourites: true
+
+# Enable Gravatar images as user profile image?
+#
+# Requires user email to be filled.
+#
+# Default: False.
+#
+# Reference:
+# * https://gravatar.com/
+navidrome_cfg_enable_gravatar: false
+
+# Enable PII/SPII redaction in log? Default: True.
+navidrome_cfg_enable_log_redacting: true
+
+# Enable automatic return of album covert art?
+#
+# Otherwise album cover art is only returned when specifically requested.
+#
+# Default: True.
+navidrome_cfg_enable_media_file_cover_art: true
+
+# Enable 'now playing' tracking? Default: True.
+navidrome_cfg_enable_now_playing: true
+
+# Enable replay gain options? Default: True.
+navidrome_cfg_enable_replay_gain: true
+
+# Enable sharing feature? Default: False.
+navidrome_cfg_enable_sharing: false
+
+# Enable 5-star ratings? Default: True.
+navidrome_cfg_enable_star_rating: true
+
+# Enable transcoding configuration? Default: False.
+navidrome_cfg_enable_transcoding_config: false
+
+# Enable regular user password change and details edit? Default: True.
+navidrome_cfg_enable_user_editing: true
+
+# Path to ffmpeg executable.
+#
+# Values:
+#   {PATH}: Specific ffmpeg binary to use.
+#       '': Autodetect based on service user PATH (default).
+#
+# Default: '' (autodetect).
+navidrome_cfg_ffmpeg_path: ''
+
+# Google Analytics account.
+#
+# Values:
+#   UA-{ACCOUNT}: Personal GA account for tracking.
+#             '': Disabled (default).
+#
+# Default: '' (disabled).
+navidrome_cfg_ga_tracking_id: ''
+
+# Set custom X-Frame-Options header value. Default: '' (disabled).
+navidrome_cfg_http_security_headers_custom_frame_options_value: ''
+
+# List of ignored articles when sorting/indexing artists.
+#
+# Default:
+#   - 'The'
+#   - 'El'
+#   - 'La'
+#   - 'Los'
+#   - 'Las'
+#   - 'Le'
+#   - 'Les'
+#   - 'Os'
+#   - 'As'
+#   - 'O'
+#   - 'A'
+navidrome_cfg_ignored_articles:
+  - 'The'
+  - 'El'
+  - 'La'
+  - 'Los'
+  - 'Las'
+  - 'Le'
+  - 'Les'
+  - 'Os'
+  - 'As'
+  - 'O'
+  - 'A'
+
+# Image artwork cache (0 disables) (SIZE). Default: '100MB'.
+navidrome_cfg_image_cache_size: '100MB'
+
+# Enable Jukebox mode (play audio on server hardware)?
+#
+# Default: False.
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/jukebox/
+navidrome_cfg_jukebox_enabled: false
+
+# Restrict jukebox mode to admin users? Default: True.
+navidrome_cfg_jukebox_admin_only: true
+
+# List of devices that can be used by jukebox.
+#
+# navidrome_cfg_jukebox_devices:
+#       list of dict - Hardware devices to use for jukebox.
+#   - name: str - Device name.
+#     device: str - Device address.
+#
+# navidrome_cfg_jukebox_devices:
+#   - name: 'internal'
+#     device: 'coreaudio/BuiltInSpeakerDevice'
+#   - name: 'dac'
+#     device: 'coreaudio/AppleUSBAudioEngine:Cambridge USB Audio 1.0:0000:1'
+#
+# Default: [] (autodetect).
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/jukebox/#configuration
+navidrome_cfg_jukebox_devices: []
+
+# Device name to use for jukebox ('' autodetects). Default: '' (autodetect).
+navidrome_cfg_jukebox_default: ''
+
+# Enable Last.fm integration? Default: True.
+navidrome_cfg_last_fm_enabled: true
+
+# Last.fm API key. Default: ''.
+navidrome_cfg_last_fm_api_key: ''
+
+# Last.fm API secret. Default: ''.
+navidrome_cfg_last_fm_secret: ''
+
+# Two letter-code for language to be used to retrieve biographies from Last.fm.
+#
+# Default: 'en'.
+navidrome_cfg_last_fm_language: 'en'
+
+# Enable only first artist scrobble for tracks with multiple artists?
+#
+# Default: False (all artists).
+#
+# Reference:
+# * https://en.wiktionary.org/wiki/scrobble
+navidrome_cfg_last_fm_scrobble_first_artist_only: false
+
+# ListenBrainz base URL (useful with self-hosted solutions like Maloja).
+#
+# Default: 'https://api.listenbrainz.org/1/' (listenbrainz).
+navidrome_cfg_listen_brainz_base_url: 'https://api.listenbrainz.org/1/'
+
+# Enable ListenBrainz integration? Default: True.
+navidrome_cfg_listen_brainz_enabled: true
+
+# Order and sources for fetching lyrics.
+#
+# Values:
+#   embedded: Source from audio file tags.
+#      {EXT}: File extension - search for lyrics files with the same name as
+#             audio file but with specified extension.
+#
+# Default:
+#   - '.lrc'
+#   - '.txt'
+#   - 'embedded'
+navidrome_cfg_lyrics_priority:
+  - '.lrc'
+  - '.txt'
+  - 'embedded'
+
+# Set the maximum number of playlists shown in sidebar. Default: 100.
+navidrome_cfg_max_sidebar_playlists: 100
+
+# Path to MPV executable (used for jukebox).
+#
+# Values:
+#   {PATH}: Specific MPV binary to use.
+#       '': Autodetect based on service user PATH (default).
+#
+# Default: '' (autodetect).
+navidrome_cfg_mpv_path: ''
+
+# Command template for MPV executable (used for jukebox).
+#
+# Default:
+#   'mpv --audio-device=%d --no-audio-display --pause %f --input-ipc-server=%s'
+navidrome_cfg_mpv_cmd_template:
+  'mpv --audio-device=%d --no-audio-display --pause %f --input-ipc-server=%s'
+
+# Encryption passphrase for encrypting DB passwords.
+#
+# Special Case:
+# * Cannot be changed once set.
+#
+# Default: '' (obfuscate with known public key).
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/security/#encrypted-passwords
+navidrome_cfg_password_encryption_key: ''
+
+# Tag(s) to use as Album ID.
+#
+# Values:
+#         {TAG}: Any tag from any metadata source (e.g. musicbrainz_albumid,
+#                albumartistid, album, albumversion, releasedate, Discogs ID,
+#                or custom tags).
+#   {TAG}|{TAG}: Logical OR operation for specific tags.
+#
+# Default:
+#   - 'musicbrainz_albumid|albumartistid'
+#   - 'album'
+#   - 'albumversion'
+#   - 'releasedate'
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/pids/
+navidrome_cfg_pid_album:
+  - 'musicbrainz_albumid|albumartistid'
+  - 'album'
+  - 'albumversion'
+  - 'releasedate'
+
+# Tag(s) to use as Track ID.
+#
+# Values:
+#         {TAG}: Any tag from any metadata source (e.g. musicbrainz_trackid,
+#                albumartistid, album, albumversion, releasedate, Discogs ID,
+#                or custom tags).
+#   {TAG}|{TAG}: Logical OR operation for specific tags.
+#
+# Default:
+#   - 'musicbrainz_trackid|albumid'
+#   - 'discnumber'
+#   - 'tracknumber'
+#   - 'title'
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/pids/
+navidrome_cfg_pid_track:
+  - 'musicbrainz_trackid|albumid'
+  - 'discnumber'
+  - 'tracknumber'
+  - 'title'
+
+# Limit where to search and import playlists from.
+#
+# Values:
+#   {PATH}: Relative path to navidrome_cfg_music_folder, with globbing.
+#
+# Default: [] (import all playlists).
+navidrome_cfg_playlists_path: []
+
+# Use Sort_* tags to sort columns? Default: False.
+navidrome_cfg_prefer_sort_tags: false
+
+# Enable Prometheus extra endpoint metrics? Default: False.
+navidrome_cfg_prometheus_enabled: false
+
+# Custom path for Prometheus metrics.
+#
+# Useful for blocking unauthorized metrics requests.
+#
+# Default: '/metrics'.
+navidrome_cfg_prometheus_metrics_path: '/metrics'
+
+# Enables basic auth protection for Prometheus endpoint?
+#
+# Special Case:
+# * User will be navidrome.
+#
+# Default: '' (disabled).
+navidrome_cfg_prometheus_password: ''
+
+# Use music file modification time when sorting by recently added?
+#
+# Otherwise import time is used.
+#
+# Default: False (use import time).
+navidrome_cfg_recently_added_by_mod_time: false
+
+# HTTP header containing user name from an authenticating proxy.
+#
+# Default: 'Remote-User'.
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/reverse-proxy/
+navidrome_cfg_reverse_proxy_user_header: 'Remote-User'
+
+# List of addresses which are allowed to use reverse proxy authentication.
+#
+# Option unnecessary for most reverse proxy setups - only needed for
+# authenticating reverse proxies.
+#
+# Values:
+#    {CIDR}: IPv4/IPv6 CIDR notation.
+#   @{UNIX}: Unix socket address.
+#        '': Deny all (default).
+#
+# Default: [] (deny all).
+navidrome_cfg_reverse_proxy_whitelist: []
+
+# Enable music library scanner? Default: True.
+navidrome_cfg_scanner_enabled: true
+
+# Schedule for automatic scans.
+#
+# Values:
+#   {CRON}: Cron syntax.
+#        0: Disabled (default).
+#
+# Default: '0' (disabled).
+#
+# Reference:
+# * https://en.wikipedia.org/wiki/Cron
+navidrome_cfg_scanner_schedule: '0'
+
+# Time to wait after a file change is detected before starting a scan.
+#
+# Useful to avoid scanning incomplete files.
+#
+# Values:
+#   {TIME}: Time to wait.
+#        0: Disable (scan immediately).
+#
+# Default: '5s'.
+navidrome_cfg_scanner_watcher_wait: '5s'
+
+# Enable music library scanning on startup? Default: True.
+navidrome_cfg_scanner_scan_on_startup: true
+
+# String used to join multiple artists in display.
+#
+# Change this if you prefer a different separator between artist names.
+#
+# Default: ' • '.
+navidrome_cfg_scanner_artist_joiner: ' • '
+
+# Follow symbolic links when scanning directories? Default: True.
+navidrome_cfg_scanner_follow_symlinks: true
+
+# Action for missing files, albums, and artists during database scan.
+#
+# Values:
+#    never: Mark as missing (default).
+#   always: Purge after every scan.
+#     full: Purge only after a full scan.
+#
+# Default: 'never'.
+navidrome_cfg_scanner_purge_missing: 'never'
+
+# Match query strings anywhere in searchable fields?
+#
+# Normally only searches in word boundaries. Useful for languages where words
+# are not space separated.
+#
+# Default: False.
+navidrome_cfg_search_full_string: false
+
+# Timeout for WebUI idle sessons (TIME). Default: '48h' (2 days).
+navidrome_cfg_session_timeout: '48h'
+
+# Base URL for shared links.
+#
+# Useful when server address is not public (ex: when using Tailscale).
+#
+# Default: '' (use server address).
+#
+# Reference:
+# * https://github.com/navidrome/navidrome/discussions/3117
+navidrome_cfg_share_url: ''
+
+# Refresh interval for smart playlists (TIME).
+#
+# Default: '5s'.
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/smartplaylists/
+navidrome_cfg_smart_playlist_refresh_delay: '5s'
+
+# Spotify Client ID (required for artist images). Default: '' (disabled).
+navidrome_cfg_spotify_id: ''
+
+# Spotify Client Secret (required for artist images). Default: '' (disabled).
+navidrome_cfg_spotify_secret: ''
+
+# Append subtitle tag to song title in all Subsonic API responses?
+#
+# Default: True.
+navidrome_cfg_subsonic_append_subtitle: true
+
+# Include albums where artist participates (e.g. artist compilations)?
+#
+# Default: False.
+navidrome_cfg_subsonic_artist_participations: false
+
+# Enable music file real path reporting in API?
+#
+# May be a security risk. Can be customized individually for each client and
+# player.
+#
+# Default: False.
+navidrome_cfg_subsonic_default_report_real_path: false
+
+# List of clients that do not work with new OpenSubsonic API.
+#
+# Default:
+#   - 'DSub'
+navidrome_cfg_subsonic_legacy_clients:
+  - 'DSub'
+
+# Custom tags to import from music files.
+#
+# Must perform full scan after updating tag configurations.
+#
+# Values:
+#   {TAG} = {VALUE}: TOML custom tag definition from reference.
+#
+# navidrome_cfg_tags:
+#   - 'Tags.MyCustomTag.Aliases = ["mycustomtag", "customtag"]'
+#   - 'Tags.MyCustomTag.MaxLength = 50'
+#   - 'Tags.MyCustomTag.Album = false'
+#   - 'Tags.MyCustomTag.Split = ["; ", " / "]'
+#
+# Default: [] (no custom tags).
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/customtags
+navidrome_cfg_tags: []
+
+# TLS certificate file path.
+#
+# Include signature chain if available.
+#
+# Sourced from ansible controller; automatically placed in
+# navidrome_cfg_data_folder/tls.cert with correct permissions.
+#
+# navidrome_cfg_tls_cert: 'host_vars/db.example.com/data/tls.cert'
+#
+# Default: '' (disabled).
+navidrome_cfg_tls_cert: ''
+
+# TLS certificate key path.
+#
+# Sourced from ansible controller; automatically placed in
+# navidrome_cfg_data_folder/tls.key with correct permissions.
+#
+# navidrome_cfg_tls_cert: 'host_vars/db.example.com/data/tls.key'
+#
+# Default: '' (disabled).
+navidrome_cfg_tls_key: ''
+
+# Transcoding cache (0 disables) (SIZE). Default: '100MB'.
+navidrome_cfg_transcoding_cache_size: '100MB'
+
+# Background image URL used for login page.
+#
+# Default: '' (use unsplash.com collection).
+#
+# Reference:
+# * https://unsplash.com/collections/20072696/navidrome
+navidrome_cfg_ui_login_background_url: ''
+
+# Login screen welcome message. Default: ''.
+navidrome_cfg_ui_welcome_message: ''
+
+# Unix socket octal file permissions. Default: '0660'.
+navidrome_cfg_unix_socket_perm: '0660'

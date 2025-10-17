@@ -1,0 +1,66 @@
+---
+###############################################################################
+# Default Navidrome Package Dependencies
+###############################################################################
+# Default required packages for Navidrome install.
+#
+# Updates:
+# * New MAJOR, MINOR releases should hard branch at version before starting
+#   (e.g. 2.14.x branch).
+# * Keep a separate change log as changes are made, you will not remember all
+#   of them.
+# * Use bare-metal docs to validate package/process changes.
+# * Update role defaults (includes updating defaults, tasks):
+#   * Use configuration docs to add new variables:
+#
+#       meld \
+#         <(curl -s https://www.navidrome.org/docs/usage/configuration-options/)
+#   * Use defaults/ to remove any changed/deprecated variables.
+
+
+# * Update tests for any changes.
+# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Tag with OS-APP-ROLE version.
+#
+# Reference:
+# * https://www.navidrome.org
+# * https://www.navidrome.org/docs/usage/configuration-options/
+
+
+# Last time Navidrome options were validated against default configuration.
+navidrome_role_validate_date: '2025-10-15'
+navidrome_role_validate_release: 'trixie'
+navidrome_role_validate_version: 'v0.58.0'
+
+navidrome_role_dir: '/opt/mox'
+
+###############################################################################
+# APT Packages
+###############################################################################
+
+navidrome_role_packages:
+  - 'ca-certificates'
+  - 'ffmpeg'  # Navidrome dependency not included in package (transcoding).
+  - 'mpv'  # Navidrome dependency not included in package (jukebox).
+  - 'xz-utils'  # ansible.builtin.apt remote deb URL.
+
+###############################################################################
+# Default Navidrome User/Group
+###############################################################################
+
+navidrome_role_group:
+  name: 'navidrome'
+  gid: 997
+
+navidrome_role_user:
+  name: 'navidrome'
+  group: 'navidrome'
+  uid: 997
+  shell: '/bin/sh'
+  home: '/var/lib/navidrome'
+  create_home: true
+  password: '!'
+  password_lock: true
+  update_password: 'always'
+  expires: -1
+  system: true

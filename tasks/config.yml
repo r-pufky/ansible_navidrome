@@ -1,0 +1,167 @@
+---
+###############################################################################
+# Configure Services
+###############################################################################
+# Use UID/GID as filesystems may be remote. Permissions are determined from Mox
+# install - Mox will set correct permissions on startup.
+#
+# Mox service starts as root and drops privileges once network sockets are
+# opened.
+#
+# Reference:
+# * https://www.xmox.nl/config/
+
+- name: 'Config | manage data directories'
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: '{{ _navidrome_srv_user._uid }}'
+    group: '{{ _navidrome_srv_group._gid }}'
+    mode: '0755'
+    recurse: true
+    state: 'directory'
+  loop:
+    - '{{ _navidrome_cfg_music_folder.raw }}'
+    - '{{ _navidrome_cfg_data_folder.raw }}'
+  become: true
+  become_user: '{{
+      _navidrome_srv_user.raw
+      if _navidrome_srv_user_data_manage_enable.raw else
+      "root"
+    }}'
+
+- name: 'Config | manage backup directory'
+  when: _navidrome_cfg_backup_path.raw | length > 0
+  ansible.builtin.file:
+    path: '{{ _navidrome_cfg_backup_path.raw }}'
+    owner: '{{ _navidrome_srv_user._uid }}'
+    group: '{{ _navidrome_srv_group._gid }}'
+    mode: '0755'
+    recurse: true
+    state: 'directory'
+  become: true
+  become_user: '{{
+      _navidrome_srv_user.raw
+      if _navidrome_srv_user_data_manage_enable.raw else
+      "root"
+    }}'
+
+- name: 'Config | manage cache directory'
+  ansible.builtin.file:
+    path: '{{ _navidrome_cfg_cache_folder.raw }}'
+    owner: '{{ _navidrome_srv_user._uid }}'
+    group: '{{ _navidrome_srv_group._gid }}'
+    mode: '0755'
+    state: 'directory'
+
+- name: 'Config | set TLS certificates'
+  when: _navidrome_cfg_tls_cert.raw | length > 0
+  ansible.builtin.copy:
+    src: '{{ item._src }}'
+    dest: '{{ item._dest }}'
+    owner: '{{ _navidrome_srv_user._uid }}'
+    group: '{{ _navidrome_srv_group._gid }}'
+    mode: '0640'
+    directory_mode: '0755'
+  loop:
+    - '{{ _navidrome_cfg_tls_cert }}'
+    - '{{ _navidrome_cfg_tls_key }}'
+  loop_control:
+    label: '{{ item._dest }}'
+  become: true
+  become_user: '{{
+      _navidrome_srv_user.raw
+      if _navidrome_srv_user_data_manage_enable.raw else
+      "root"
+    }}'
+
+- name: 'Config | remove TLS certificates'
+  when: _navidrome_cfg_tls_cert.raw | length == 0
+  ansible.builtin.file:
+    path: '{{ item._dest }}'
+    state: 'absent'
+  loop:
+    - '{{ _navidrome_cfg_tls_cert }}'
+    - '{{ _navidrome_cfg_tls_key }}'
+  loop_control:
+    label: '{{ item._dest }}'
+  become: true
+  become_user: '{{
+      _navidrome_srv_user.raw
+      if _navidrome_srv_user_data_manage_enable.raw else
+      "root"
+    }}'
+
+- name: 'Config | set navidrome.toml'
+  ansible.builtin.template:
+    src: 'navidrome.toml.j2'
+    dest: '/etc/navidrome/navidrome.toml'
+    owner: '{{ _navidrome_srv_user._uid }}'
+    group: '{{ _navidrome_srv_group._gid }}'
+    mode: '0640'  # Originally 0644 w/ sensitive passwords.
+
+
+- name: 'Config | set service definitions'
+  ansible.builtin.include_role:
+    name: 'r_pufky.deb.systemd'
+  vars:
+    systemd_daemon_reload_enable: true
+    systemd_services:
+      - name: 'navidrome'
+        state: 'present'
+        drop_in: false
+        unit:
+          description: 'Your Personal Streaming Service'
+          condition_file_is_executable:
+            - '/usr/bin/navidrome'
+          after:
+            - 'remote-fs.target'
+            - 'network.target'
+          start_limit_interval_sec: 5
+          start_limit_burst: 10
+        service:
+          exec_start:
+            - >-
+              /usr/bin/navidrome "service" "execute" "-c"
+              "/etc/navidrome/navidrome.toml"
+          restart: 'on-failure'
+          success_exit_status:
+            - 1
+            - 2
+            - 8
+            - 'SIGKILL'
+          timeout_stop_sec: 20
+          restart_sec: 120
+        exec:
+          user: '{{ _navidrome_srv_user.raw }}'
+          working_directory: '/var/lib/navidrome'
+          environment_file:
+            - '-/etc/sysconfig/navidrome'
+          device_policy: 'closed'
+          no_new_privileges: true
+          private_tmp: true
+          protect_control_groups: true
+          protect_kernel_modules: true
+          protect_kernel_tunables: true
+          restrict_address_families:
+            - 'AF_UNIX'
+            - 'AF_INET'
+            - 'AF_INET6'
+          restrict_namespaces: true
+          restrict_realtime: true
+          system_call_filter_deny:
+            - set: '@clock'
+            - set: '@debug'
+            - set: '@module'
+            - set: '@mount'
+            - set: '@obsolete'
+            - set: '@reboot'
+            - set: '@setuid'
+            - set: '@swap'
+          read_write_paths:
+            - '/var/lib/navidrome'
+            # Include application data in case it is moved.
+            - '{{ _navidrome_cfg_data_folder.raw }}'
+          protect_system: 'full'
+        install:
+          wanted_by:
+            - 'multi-user.target'

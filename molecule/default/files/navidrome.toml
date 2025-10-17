@@ -1,0 +1,3 @@
+MusicFolder = "/data/navidrome/music"
+DataFolder = "/data/navidrome/data"
+CacheFolder = "/var/lib/navidrome/cache"

@@ -1,0 +1,37 @@
+---
+- name: 'Verify'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    # Navidrome running ensure navidrome.toml is correct.
+    - name: 'Verify | /data/navidrome'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Verify | /data/navidrome/{{ item }}'
+        test_file: '/data/navidrome/{{ item }}'
+        test_owner: 'navidrome'
+        test_group: 'navidrome'
+        test_mode: '0755'
+        test_state: 'directory'
+        test_diff: true
+      loop:
+        - 'data'
+        - 'music'
+
+    - name: 'Verify | /data/navidrome/data/tls.*'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'file.yml'
+      vars:
+        test_name: 'Verify | /data/navidrome/data/{{ item }}'
+        test_file: '/data/navidrome/data/{{ item }}'
+        test_owner: 'navidrome'
+        test_group: 'navidrome'
+        test_mode: '0640'
+        test_state: 'file'
+        test_diff: true
+      loop:
+        - 'tls.cert'
+        - 'tls.key'

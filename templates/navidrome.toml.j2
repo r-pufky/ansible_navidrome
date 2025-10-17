@@ -1,0 +1,19 @@
+{% for header in _navidrome_order %}
+{%   for section in _navidrome_map | selectattr('value.section', '==', header) | sort(attribute='value.order') %}
+{%     if not section.value.deprecated and (section.value.keep or section.value.raw != section.value.default) %}
+{%       if section.value.key == 'Tags' %}
+{{ section.value.data }}
+{%       elif section.value.hint == 'list of str' %}
+{{ section.value.key }} = "{{ section.value.data }}"
+{%       elif section.value.hint == 'list of dict' %}
+{{ section.value.key }} = {{ section.value.data }}
+{%       elif section.value.hint == 'str' %}
+{{ section.value.key }} = "{{ section.value.raw }}"
+{%       elif section.value.hint == 'bool' %}
+{{ section.value.key }} = {{ section.value.raw | lower }}
+{%       else %}
+{{ section.value.key }} = {{ section.value.raw }}
+{%       endif %}
+{%     endif %}
+{%   endfor %}
+{% endfor %}

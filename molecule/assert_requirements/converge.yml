@@ -1,0 +1,49 @@
+---
+- name: 'Converge'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Converge | assert volume high'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'assertions.yml'
+      vars:
+        test_name: 'Converge | assert volume high'
+        test_role: 'r_pufky.srv.navidrome'
+        test_fail_message:
+          'navidrome_cfg_default_ui_volume > 100 did not trigger assertion.'
+        navidrome_cfg_default_ui_volume: 101
+
+    - name: 'Converge | assert volume low'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'assertions.yml'
+      vars:
+        test_name: 'Converge | assert volume low'
+        test_role: 'r_pufky.srv.navidrome'
+        test_fail_message:
+          'navidrome_cfg_default_ui_volume < 1 did not trigger assertion.'
+        navidrome_cfg_default_ui_volume: 0
+
+    - name: 'Converge | assert google analytics format'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'assertions.yml'
+      vars:
+        test_name: 'Converge | assert google analytics format'
+        test_role: 'r_pufky.srv.navidrome'
+        test_fail_message:
+          'navidrome_cfg_ga_tracking_id=12345678 did not trigger assertion.'
+        navidrome_cfg_ga_tracking_id: '12345678'
+
+    - name: 'Converge | assert TLS requirements'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'assertions.yml'
+      vars:
+        test_name: 'Converge | assert TLS requirements'
+        test_role: 'r_pufky.srv.navidrome'
+        test_fail_message:
+          'navidrome_cfg_tls_key="" did not trigger assertion.'
+        navidrome_cfg_tls_cert: 'tls.key'
+        navidrome_cfg_tls_key: ''

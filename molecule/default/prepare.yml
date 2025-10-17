@@ -1,0 +1,12 @@
+---
+- name: 'Prepare'
+  hosts: 'navidrome-debian-13-user_data'
+  gather_facts: false
+  tasks:
+    - name: 'Prepare | simulate user media restriction'
+      ansible.builtin.file:
+        path: '/data'
+        owner: 997
+        group: 997
+        mode: '0755'
+        state: 'directory'

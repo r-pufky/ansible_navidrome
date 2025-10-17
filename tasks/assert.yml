@@ -1,0 +1,56 @@
+---
+###############################################################################
+# Assert Settings
+###############################################################################
+# Sanity check options to stop preventable errors and accidental data deletion.
+
+- name: 'Assert | volume range'
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - 'navidrome_cfg_default_ui_volume >= 1'
+      - 'navidrome_cfg_default_ui_volume <= 100'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │      Requirements not met: navidrome_cfg_default_ui_volume.       │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Volume range must be between 0-100 inclusive.
+      │
+      │ navidrome_cfg_default_ui_volume: {{ navidrome_cfg_default_ui_volume }}
+
+- name: 'Assert | google analytics account'
+  when: navidrome_cfg_ga_tracking_id | length > 0
+  ansible.builtin.assert:
+    quiet: true
+    that: 'navidrome_cfg_ga_tracking_id.startswith("UA-")'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │        Requirements not met: navidrome_cfg_ga_tracking_id.        │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Google Analytics account must start with 'UA-'.
+      │
+      │ navidrome_cfg_ga_tracking_id: {{ navidrome_cfg_ga_tracking_id }}
+
+- name: 'Assert | TLS requirements'
+  when: >
+    navidrome_cfg_tls_cert | length > 0 or
+    navidrome_cfg_tls_key | length > 0
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - 'navidrome_cfg_tls_cert | length > 0'
+      - 'navidrome_cfg_tls_key | length > 0'
+    fail_msg: |
+      ╭───────────────────────────────────────────────────────────────────╮
+      │                                                                   │
+      │              Requirements not met: TLS certificates.              │
+      │                                                                   │
+      ├───────────────────────────────────────────────────────────────────╯
+      │ Both TLS certificate and private key are required.
+      │
+      │ navidrome_cfg_tls_cert: {{ navidrome_cfg_tls_cert }}
+      │ navidrome_cfg_tls_key: {{ navidrome_cfg_tls_key }}
