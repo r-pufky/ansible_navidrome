@@ -86,7 +86,7 @@
     - name: 'Prepare | simulate user media restriction'
       ansible.builtin.file:
         path: '/data'
-        owner: 997
-        group: 997
+        owner: 977
+        group: 977
         mode: '0755'
         state: 'directory'

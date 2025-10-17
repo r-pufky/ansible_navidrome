@@ -50,12 +50,12 @@ navidrome_role_packages:
 
 navidrome_role_group:
   name: 'navidrome'
-  gid: 997
+  gid: 977
 
 navidrome_role_user:
   name: 'navidrome'
   group: 'navidrome'
-  uid: 997
+  uid: 977
   shell: '/bin/sh'
   home: '/var/lib/navidrome'
   create_home: true
