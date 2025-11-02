@@ -16,5 +16,7 @@ galaxy_info:
     - 'navidrome'
     - 'music'
     - 'streaming'
+    - 'media'
+    - 'management'
 
 dependencies: []

@@ -614,7 +614,6 @@
         order=41
         )
       }}"
-    # TODO - ensure rendered properly. Add comment.
     _navidrome_cfg_jukebox_devices: "{{
       {} | r_pufky.data.v3(
         section='advanced',

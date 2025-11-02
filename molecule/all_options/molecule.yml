@@ -118,7 +118,6 @@ provisioner:
           - 'Tags.MyCustomTag.MaxLength = 50'
           - 'Tags.MyCustomTag.Album = false'
           - 'Tags.MyCustomTag.Split = ["; ", " / "]'
-        # TODO - prep create TLS cert
         navidrome_cfg_tls_cert: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/cache/server-cert.pem"
@@ -150,15 +149,10 @@ lint: |
   ansible-lint .
 scenario:
   test_sequence:
-    # - 'dependency'
-    # - 'cleanup'
     - 'destroy'
     - 'syntax'
     - 'create'
     - 'prepare'
     - 'converge'
-    # - 'idempotence'  # Files created, extracted, created, deleted.
-    # - 'side_effect'
     - 'verify'
-    # - 'cleanup'
     - 'destroy'

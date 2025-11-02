@@ -2,30 +2,22 @@
 ###############################################################################
 # Default Navidrome Package Dependencies
 ###############################################################################
-# Default required packages for Navidrome install.
+# Navidrome is a single Golang binary.
 #
 # Updates:
-# * New MAJOR, MINOR releases should hard branch at version before starting
-#   (e.g. 2.14.x branch).
-# * Keep a separate change log as changes are made, you will not remember all
-#   of them.
+# * Branch for new Debian releases.
+# * KEEP a separate change log as changes are made.
 # * Use bare-metal docs to validate package/process changes.
 # * Update role defaults (includes updating defaults, tasks):
-#   * Use configuration docs to add new variables:
-#
-#       meld \
-#         <(curl -s https://www.navidrome.org/docs/usage/configuration-options/)
-#   * Use defaults/ to remove any changed/deprecated variables.
-
-
+#   * Use configuration docs to add new variables.
+#   * Use defaults to remove any changed/deprecated variables.
 # * Update tests for any changes.
-# * Standard role validation testing (yamllint, ansible-lint, todo, noqa).
+# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
 # * Tag with OS-APP-ROLE version.
 #
 # Reference:
 # * https://www.navidrome.org
 # * https://www.navidrome.org/docs/usage/configuration-options/
-
 
 # Last time Navidrome options were validated against default configuration.
 navidrome_role_validate_date: '2025-10-15'
@@ -39,7 +31,7 @@ navidrome_role_dir: '/opt/mox'
 ###############################################################################
 
 navidrome_role_packages:
-  - 'ca-certificates'
+  - 'ca-certificates'  # Up to date certificates for certificate validation.
   - 'ffmpeg'  # Navidrome dependency not included in package (transcoding).
   - 'mpv'  # Navidrome dependency not included in package (jukebox).
   - 'xz-utils'  # ansible.builtin.apt remote deb URL.
