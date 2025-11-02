@@ -17,7 +17,7 @@ All ports and protocols have been defined for the role.
 
 ## Dependencies
 **galaxy-ng** roles cannot be used independently. Part of
-[r_pufky.srv](https://github.com/r-pufky/ansible_collection_srv) collection.
+[r_pufky.media](https://github.com/r-pufky/ansible_collection_media) collection.
 
 ## Example Playbook
 Read defaults documentation.
@@ -28,7 +28,7 @@ Deploy Navidrome with specific music and data directories.
   hosts: 'navidrome.example.com'
   become: true
   roles:
-     - 'r_pufky.srv.navidrome'
+     - 'r_pufky.media.navidrome'
   vars:
     navidrome_cfg_music_folder: '/data/navidrome/music'
     navidrome_cfg_data_folder: '/data/navidrome/data'

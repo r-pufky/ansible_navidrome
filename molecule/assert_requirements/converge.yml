@@ -9,7 +9,7 @@
         tasks_from: 'assertions.yml'
       vars:
         test_name: 'Converge | assert volume high'
-        test_role: 'r_pufky.srv.navidrome'
+        test_role: 'r_pufky.media.navidrome'
         test_fail_message:
           'navidrome_cfg_default_ui_volume > 100 did not trigger assertion.'
         navidrome_cfg_default_ui_volume: 101
@@ -20,7 +20,7 @@
         tasks_from: 'assertions.yml'
       vars:
         test_name: 'Converge | assert volume low'
-        test_role: 'r_pufky.srv.navidrome'
+        test_role: 'r_pufky.media.navidrome'
         test_fail_message:
           'navidrome_cfg_default_ui_volume < 1 did not trigger assertion.'
         navidrome_cfg_default_ui_volume: 0
@@ -31,7 +31,7 @@
         tasks_from: 'assertions.yml'
       vars:
         test_name: 'Converge | assert google analytics format'
-        test_role: 'r_pufky.srv.navidrome'
+        test_role: 'r_pufky.media.navidrome'
         test_fail_message:
           'navidrome_cfg_ga_tracking_id=12345678 did not trigger assertion.'
         navidrome_cfg_ga_tracking_id: '12345678'
@@ -42,7 +42,7 @@
         tasks_from: 'assertions.yml'
       vars:
         test_name: 'Converge | assert TLS requirements'
-        test_role: 'r_pufky.srv.navidrome'
+        test_role: 'r_pufky.media.navidrome'
         test_fail_message:
           'navidrome_cfg_tls_key="" did not trigger assertion.'
         navidrome_cfg_tls_cert: 'tls.key'
