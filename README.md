@@ -36,7 +36,7 @@ Deploy Navidrome with specific music and data directories.
 * Additional music locations and user configuration done through WebUI.
 
 ## Development
-Configure [environment](https://github.com/r-pufky/ansible_collection_docs/blob/main/ansible/environment.md)
+Configure [environment](https://r-pufky.github.io/ansible_collection_docs/ansible/environment)
 
 Run all unit tests:
 ``` bash
