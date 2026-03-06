@@ -2,6 +2,10 @@
 ###############################################################################
 # Install Packages & Services
 ###############################################################################
+# Manually download debian package (instead of using URL with ansible apt) as
+# this allows for injecting a cached package as well as using github tokens for
+# downloading, minimizing 403's with multiple role applications.
+#
 # Reference:
 # * https://github.com/navidrome/navidrome/releases
 
@@ -10,28 +14,41 @@
     name: 'r_pufky.deb.apt'
   vars:
     apt_packages:
-      - '{{ navidrome_role_packages }}'
+      - '{{ navidrome___packages }}'
     apt_package_update_cache: true
 
-- name: 'Install | download 🗘'
-  ansible.builtin.debug:
-    msg: |
-      ╭───────────────────────────────────────────────────────────────────╮
-      │                                                                   │
-      │    Navidrome is being installed. This will take a few minutes.    │
-      │                                                                   │
-      ╰───────────────────────────────────────────────────────────────────╯
+- name: 'Install | filesystem | stage navidrome (~1 minute) 🗘'
+  when: not (url_inject_enable | default(false))
+  ansible.builtin.get_url:
+    url: '{{ navidrome__cfg._url }}'
+    dest: '{{ "/tmp/" ~ navidrome__cfg._package }}'
+    force: false
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+    headers:
+      Authorization: '{{ navidrome__srv._token | default(omit) }}'
+  register: navidrome__cmd
+  until: navidrome__cmd is succeeded
 
-- name: 'Install | navidrome {{ _navidrome_srv_version.raw }}'
+- name: 'Install | apt | navidrome {{ navidrome__srv._version }}'
   ansible.builtin.apt:
-    deb: '{{ _navidrome_srv_version._url }}'
+    deb: '{{ "/tmp/" ~ navidrome__cfg._package }}'
     install_recommends: true
     state: 'present'
 
-- name: 'Prep | stop services'
+- name: 'Prep | systemd | stop services'
   ansible.builtin.systemd:
-    name: '{{ item }}'
+    name: 'navidrome.service'
     state: 'stopped'
   failed_when: false
-  loop:
-    - 'navidrome.service'
+
+- name:
+    '{{ "Install | filesystem | set minimal " ~ navidrome___app._cfg }}'
+  when: navidrome__cfg._file | length == 0
+  ansible.builtin.template:
+    src: 'navidrome.toml.j2'
+    dest: '{{ navidrome___app._cfg }}'
+    owner: '{{ navidrome__cfg._uid }}'
+    group: '{{ navidrome__cfg._gid }}'
+    mode: '0640'  # Originally 0644 w/ sensitive passwords.

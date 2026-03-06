@@ -8,43 +8,71 @@
 # * Branch for new Debian releases.
 # * KEEP a separate change log as changes are made.
 # * Use bare-metal docs to validate package/process changes.
-# * Update role defaults (includes updating defaults, tasks):
-#   * Use configuration docs to add new variables.
-#   * Use defaults to remove any changed/deprecated variables.
+# * Update defaults.
 # * Update tests for any changes.
-# * Standard role validation testing (yamllint, ansible-lint, to-do, no-qa).
-# * Tag with OS-APP-ROLE version.
+# * Standard validation testing (yamllint, ansible-lint, to-do, no-qa).
 #
 # Reference:
 # * https://www.navidrome.org
-# * https://www.navidrome.org/docs/usage/configuration-options/
+# * https://www.navidrome.org/docs/usage/configuration-options
 
-# Last time Navidrome options were validated against default configuration.
-navidrome_role_validate_date: '2025-10-15'
-navidrome_role_validate_release: 'trixie'
-navidrome_role_validate_version: 'v0.58.0'
+navidrome___release: "{{ {} | r_pufky.data.v3(
 
-navidrome_role_dir: '/opt/mox'
+    _date='2025-10-15',
+    _debian='trixie',
+    _app='v0.60.3',
+  ) }}"
 
 ###############################################################################
 # APT Packages
 ###############################################################################
 
-navidrome_role_packages:
+navidrome___packages:
   - 'ca-certificates'  # Up to date certificates for certificate validation.
   - 'ffmpeg'  # Navidrome dependency not included in package (transcoding).
   - 'mpv'  # Navidrome dependency not included in package (jukebox).
   - 'xz-utils'  # ansible.builtin.apt remote deb URL.
 
 ###############################################################################
+# Navidrome
+###############################################################################
+# User defined version is overlayed in prep.yml. Use debian package locations.
+#
+# Reference:
+# * https://github.com/navidrome/navidrome/releases
+
+navidrome___repo_url:
+  'https://github.com/navidrome/navidrome/releases/download/'
+navidrome___package: '{{
+    "navidrome_" ~ navidrome___release._app.split("v")[-1] ~
+    "_linux_amd64.deb"
+  }}'
+
+navidrome___app: "{{ {} | r_pufky.data.v3(
+
+    _version=navidrome___release._app,
+    _package=navidrome___package,
+    _opt_dir='/opt/navidrome',
+    _var_dir='/var/lib/navidrome',
+    _etc_dir='/etc/navidrome',
+    _cfg='/etc/navidrome/navidrome.toml',
+    _drop_in='/etc/systemd/system/navidrome.service.d/override.conf',
+    _base_url=navidrome___repo_url,
+    _url=(
+      navidrome___repo_url ~ navidrome___release._app ~ '/' ~
+      navidrome___package
+    ),
+  ) }}"
+
+###############################################################################
 # Default Navidrome User/Group
 ###############################################################################
 
-navidrome_role_group:
+navidrome___group:
   name: 'navidrome'
   gid: 977
 
-navidrome_role_user:
+navidrome___user:
   name: 'navidrome'
   group: 'navidrome'
   uid: 977

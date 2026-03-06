@@ -1,83 +1,161 @@
 ---
 ###############################################################################
-# Navidrome Service Configuration
+# Feature Flags
 ###############################################################################
-# Install size: ~795MB
-#      ffpmeg: ~683MB.
-#         mpv: ~50MB.
-#   navidrome: ~60MB.
 
-# Navidrome Release.
+# 1. Backup SQLite, navidrome.toml to navidrome_cfg_backup_dir?
 #
-# Versions (Schematic):
-#       MAJOR: Safe - Usually requires no role updates.
-#       MINOR: Safe - Usually requires no role updates.
-#       PATCH: Safe - Usually requires no role updates.
-#   RECOMMEND: Always check release notes when upgrading versions - most
-#              version changes require manual migration of data store. Never
-#              use 'latest'.
+# Backup existing config, DB, and exit role. Only applies to SQLite databases
+# configured in DataFolder. navidrome_cfg_backup_dir created if non-existent.
+# Services stopped for backup and restarted.
 #
-# Values:
-#   {VERSION}: Tagged release to use ('v0.58.0').
-#      latest: Use latest stable release.
-#
-# Default: 'v0.58.0'.
-#
-# Reference:
-# * https://github.com/mjl-/mox/releases
-navidrome_srv_version: 'v0.58.0'
+# Default: False.
+navidrome_flg_backup: false
 
-# Halt role if specified version != role version?
+# 2. Restore SQLite, navidrome.toml?
 #
-# Navidrome upgrades generally require manual upgrade steps listed in release
-# notes.
+# Restore existing config, DB, and exit role.
+#
+# navidrome.toml:
+# Configuration is applied via navidrome_cfg_file.
+#
+# Database (SQLite only):
+# Restored from latest backup in navidrome_cfg_backup_dir to
+# DataFolder in restored configuration file. Custom DataFolder paths are
+# **not** created. These must be created before executing restore (as with all
+# custom user data directories).
+#
+# Services are stopped, files restored, services updated, services restarted,
+# then validated.
+#
+# Default: False.
+navidrome_flg_restore: false
+
+# 3. Run maintenance tasks?
+#
+# Preform role maintenance tasks including removal of old role versions. Does
+# not affect running services.
 #
 # Default: True.
+navidrome_flg_maintenance: true
+
+# 4. Install application?
 #
-# Reference:
-# * https://github.com/mjl-/mox/releases
-navidrome_srv_version_fatal_enable: true
+# Creates users, download and install release package, update services, and set
+# minimal navidrome.toml if not specified. Services stopped.
+#
+# Default user runtime data is stored /var/lib/navidrome with default music
+# location set to /opt/navidrome/music. Alternative user defined locations for
+# this data must be managed outside of the role.
+#
+# Default: True.
+navidrome_flg_install: true
+
+# 5. Set navidrome.toml?
+#
+# File set using navidrome_cfg_file. Stops service and deploys user
+# configuration, updates services. Services stopped.
+#
+# Default: False.
+navidrome_flg_config: false
+
+# 7. Verify service running?
+#
+# Start services after role application and verify running or fail.
+#
+# Default: True.
+navidrome_flg_start: true
 
 ###############################################################################
-# Navidrome User
+# Service
 ###############################################################################
+
+# Navidrome release.
+#
+# Navidrome upgrades generally require manual upgrade steps listed in release
+# notes. Submit an issue if future versions break role deployment.
+#
+# Default: 'v0.60.3'.
+#
+# Reference:
+# * https://github.com/navidrome/navidrome/releases
+navidrome_srv_version: 'v0.60.3'
+
+# Github access token.
+#
+# Unauthenticated (anonymous) API requests are heavily restricted to the sum
+# total of requests to github from a given IP. Use an access token if
+# receiving 403's.
+#
+# Classic Tokens:
+# * settings > developer settings > personal access tokens (classic)
+#   * notes: {LABEL APPROPRIATELY}
+#   * expiration: {CUSTOM}
+#   * scopes: NONE
+#
+# Fine-grained Tokens:
+# * settings > developer settings > personal access tokens (fine-grained)
+#   * token name: {LABEL APPROPRIATELY}
+#   * expiration: {CUSTOM}
+#   * description: {DESCRIPTIVE TEXT}
+#   * resource owner: {YOUR ACCOUNT}
+#   * repository access: Public Repositories (read-only)
+#
+# Default: '' (unauthenticated).
+#
+# Reference:
+# * https://docs.github.com/en/authentication
+navidrome_srv_token: ''
 
 # User that Navidrome will run under.
 #
-# Enable navidrome_srv_create_user if account is not externally managed.
+# 'navidrome' will automatically be created using vars/main.yml if required.
+# All other accounts are checked for existence.
 #
-# Default: 'mox'.
+# Default: 'navidrome'.
 navidrome_srv_user: 'navidrome'
 
 # Group that Navidrome will run under.
 #
-# Enable navidrome_srv_create_user if group is not externally managed.
+# 'navidrome' will automatically be created using vars/main.yml if required.
+# All other accounts are checked for existence.
 #
-# Default: 'mox'.
+# Default: 'navidrome'.
 navidrome_srv_group: 'navidrome'
 
-# Create navidrome_srv_user, navidrome_srv_group if not detected?
-#
-# Applied via r_pufky.deb.users, see vars/main.yml for default user attributes.
-#
-# Default: True.
-navidrome_srv_create_user: true
-
 ###############################################################################
-# Media Permissions
+# Config
 ###############################################################################
 
-# Enable user management of data/media files?
+# navidrome.toml to set.
 #
-# Use navidrome_srv_user to execute data/media management commands. Role
-# applies media permissions using 'root' by default. For mounted data locations
-# (NFS with squashed mounts, mapped container mounts, etc) the local root user
-# will not have sufficient privileges to modify these files.
+# Ansible controller path to source navidrome.toml (treated as a jinja2
+# template allowing for ansible variable interpretation). Overwrites existing
+# /etc/navidrome/navidrome.toml.
 #
-# Applies to:
-# * navidrome_cfg_music_folder
-# * navidrome_cfg_data_folder
-# * navidrome_cfg_backup_path
+# A minimally configured template that works with the role will be deployed if
+# no config file is specified (see templates/navidrome.toml.j2):
+#   DataFolder = "/var/lib/navidrome"
+#   MusicFolder = "/opt/navidrome/music"
 #
-# Default: True.
-navidrome_srv_user_data_manage_enable: true
+# Manage additional files and directories (such as DB root certificates, custom
+# user data storage locations, etc.) outside of the role. Must be accessible to
+# navidrome_srv_user account.
+#
+# navidrome_cfg_file: 'host_vars/navi.example.com/navidrome.toml'
+#
+# Default: '' (use minimally configured role template).
+#
+# Reference:
+# * https://www.navidrome.org/docs/usage/configuration/options
+navidrome_cfg_file: ''
+
+# Role backup location.
+#
+# All backup operations for a given role execution are stored locally on
+# ansible controller with the format 'YYYY-MM-DDTHHMMSS_{FILE}'.
+#
+# navidrome_cfg_backup_dir: 'data/navi'
+#
+# Default: ''
+navidrome_cfg_backup_dir: ''

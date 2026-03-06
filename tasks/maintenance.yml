@@ -1,0 +1,17 @@
+---
+###############################################################################
+# Maintenance
+###############################################################################
+# Prune any old files from previous role versions. This is executed before any
+# operations with the new role version.
+#
+# Use shell command to increase execution speed for multiple directories.
+
+# 3.0.0 changed role structure:
+# * Remove role placed TLS certs.
+- name: 'Maintenance | 3.0.0 | remove old versions'
+  ansible.builtin.shell: >-
+    rm -f /var/lib/navidrome/tls.*
+  args:
+    executable: '/bin/bash'
+    removes: '/var/lib/navidrome/tls.key'

@@ -2,5 +2,5 @@
 #
 # https://www.navidrome.org/docs/usage/configuration/options
 
-DataFolder = "{{ navidrome___app._var_dir }}"
-MusicFolder = "{{ navidrome___app._opt_dir }}/music"
+DataFolder = "/var/lib/navidrome"
+MusicFolder = "/opt/navidrome/music"

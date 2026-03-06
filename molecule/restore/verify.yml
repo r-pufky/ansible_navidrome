@@ -11,7 +11,7 @@
         test_name: 'Verify | /etc/navidrome/navidrome.toml'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
-            "/molecule/files/navidrome.toml"
+            "/molecule/files/navidrome.toml.role_defaults"
           }}'
         test_file: '/etc/navidrome/navidrome.toml'
         test_owner: 'navidrome'
@@ -29,6 +29,6 @@
         test_file: '/var/lib/navidrome/navidrome.db'
         test_owner: 'navidrome'
         test_group: 'navidrome'
-        test_mode: '0644'
+        test_mode: '0640'  # Restored files are set to 0640.
         test_state: 'file'
         test_diff: true

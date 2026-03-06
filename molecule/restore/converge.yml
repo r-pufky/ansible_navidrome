@@ -1,0 +1,14 @@
+---
+- name: 'Converge'
+  hosts: 'all'
+  gather_facts: false
+  tasks:
+    - name: 'Converge | apply r_pufky.media.navidrome'
+      ansible.builtin.include_role:
+        name: 'r_pufky.media.navidrome'
+      vars:
+        navidrome_flg_restore: true
+        navidrome_cfg_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/navidrome.toml.role_defaults"
+          }}'

@@ -6,3 +6,34 @@
     - name: 'Converge | apply r_pufky.media.navidrome'
       ansible.builtin.include_role:
         name: 'r_pufky.media.navidrome'
+
+    - name: 'Converge | verify | minimal /etc/navidrome/navidrome.toml'
+      ansible.builtin.include_role:
+        name: 'r_pufky.lib.tests'
+        tasks_from: 'copy.yml'
+      vars:
+        test_name: 'Verify | minimal /etc/navidrome/navidrome.toml'
+        test_src: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/navidrome.toml.role_defaults"
+          }}'
+        test_file: '/etc/navidrome/navidrome.toml'
+        test_owner: 'navidrome'
+        test_group: 'navidrome'
+        test_mode: '0640'
+        test_diff: true
+
+    # Re-run with user test navidrome.toml.
+    - name: 'Converge | apply r_pufky.media.navidrome'
+      ansible.builtin.include_role:
+        name: 'r_pufky.media.navidrome'
+      vars:
+        navidrome_cfg_file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
+            "/molecule/files/navidrome.toml"
+          }}'
+        navidrome_flg_backup: false
+        navidrome_flg_maintenance: false
+        navidrome_flg_install: false
+        navidrome_flg_config: true
+        navidrome_flg_start: true

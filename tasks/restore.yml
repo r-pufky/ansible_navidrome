@@ -1,0 +1,87 @@
+---
+###############################################################################
+# Restore
+###############################################################################
+# Apply configuration as normal from role. Find the latest set of SQLite DB
+# backups and copy to remote using DataFolder. Restart services and validate
+# they are running from role.
+#
+# Databases:
+#   navidrome.db
+#   navidrome.db-shm
+#   navidrome.db-wal
+
+# Requires navidrome_cfg_file set.
+- name: 'Restore | include | config.yml'
+  ansible.builtin.import_tasks: 'config.yml'
+
+# See services.yml for awk explanation.
+- name: 'Restore | awk | DataFolder'
+  ansible.builtin.shell: >-
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: navidrome__awk_data
+
+- name: 'Restore | fact | parse required values'
+  ansible.builtin.set_fact:
+    navidrome__cfg: "{{ navidrome__cfg | r_pufky.data.v3(
+
+        _data_folder=navidrome__awk_data.stdout |
+        default(navidrome___app._var_dir),
+      ) }}"
+
+- name: 'Restore | filesystem | enumerate backups'
+  delegate_to: 'localhost'
+  ansible.builtin.find:
+    paths: '{{ navidrome__cfg._backup_dir }}'
+    patterns: '*.db'
+    file_type: 'file'
+    recurse: false
+  register: navidrome__dbs
+
+# Grab datestamp from expected 'YYYY-MM-DDTHHMMSS_{FILE}' format.
+- name: 'Restore | fact | parse latest backup'
+  when: navidrome__dbs.files | length > 0
+  ansible.builtin.set_fact:
+    navidrome__restore_base: '{{
+
+        (
+          navidrome__dbs.files |
+          sort(attribute="mtime", reverse=true) |
+          first
+        ).path | basename | split(".db") | first
+      }}'
+
+- name: 'Restore | filesystem | enumerate latest backup'
+  when: navidrome__dbs.files | length > 0
+  delegate_to: 'localhost'
+  ansible.builtin.find:
+    paths: '{{ navidrome__cfg._backup_dir }}'
+    patterns: '{{ navidrome__restore_base ~ ".*" }}'
+    file_type: 'file'
+    recurse: false
+  register: navidrome__dbs
+
+- name: 'Restore | copy | SQLite DB'
+  when: navidrome__dbs.matched > 0
+  ansible.builtin.copy:
+    src: '{{ item.path }}'
+    dest: '{{
+        navidrome__awk_data.stdout ~ "/navidrome" ~ item.path | splitext | last
+      }}'
+    owner: '{{ navidrome__cfg._uid }}'
+    group: '{{ navidrome__cfg._gid }}'
+    mode: '0640'
+    force: true
+  loop: '{{ navidrome__dbs.files }}'
+
+- name: 'Restore | include | services.yml'
+  ansible.builtin.import_tasks: 'services.yml'
+
+- name: 'Restore | include | start.yml'
+  ansible.builtin.import_tasks: 'start.yml'
+
+- name: 'Restore | success ✔'
+  ansible.builtin.meta: 'end_host'

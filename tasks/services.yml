@@ -1,0 +1,58 @@
+---
+###############################################################################
+# Services
+###############################################################################
+# Service requires dynamic data folder from navidrome.toml and user/group. Pull
+# configured values from remote node and update services.
+#
+# Rejected Methods:
+# * slurp with heavy jinja2 post-processing is overly complicated and unclear.
+# * lineinfile forces either a changed or deleted line but cannot read only.
+#
+# Just use awk.
+#
+# Reference:
+# * https://github.com/ansible-collections/community.general/issues/7889
+
+- name: 'Services | awk | DataFolder'
+  ansible.builtin.shell: >-
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: navidrome__awk_data
+
+# May duplicate /var/lib/navidrome.
+- name: 'Services | fact | parse required values'
+  ansible.builtin.set_fact:
+    navidrome__cfg: "{{ navidrome__cfg | r_pufky.data.v3(
+
+        _data_folder=navidrome__awk_data.stdout | default(''),
+      ) }}"
+
+- name: '{{
+      "Services | systemd | create " ~ navidrome___app._drop_in | dirname
+    }}'
+  ansible.builtin.file:
+    path: '{{ navidrome___app._drop_in | dirname }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+    state: 'directory'
+
+- name: '{{ "Services | systemd | create " ~ navidrome___app._drop_in }}'
+  ansible.builtin.template:
+    src: 'systemd/override.conf.j2'
+    dest: '{{ navidrome___app._drop_in }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+
+- name: 'Services | systemd | daemon reload'
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: 'Services | systemd | enable'
+  ansible.builtin.systemd:
+    name: 'navidrome.service'
+    enabled: true

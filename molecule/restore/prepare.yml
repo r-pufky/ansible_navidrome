@@ -52,9 +52,12 @@
       loop:
         - '{{ navidrome___app._package }}'
 
-    # Base install moving source builds to a 1-time process rather than
-    # requiring rebuilds on re-tests. Re-running the same process in converge
-    # should result in no change.
-    - name: 'Prepare | apply r_pufky.media.navidrome'
+    - name: 'Prepare | apply r_pufky.media.navidrome (install base)'
       ansible.builtin.include_role:
         name: 'r_pufky.media.navidrome'
+
+    - name: 'Prepare | apply r_pufky.media.navidrome (create db backup)'
+      ansible.builtin.include_role:
+        name: 'r_pufky.media.navidrome'
+      vars:
+        navidrome_flg_backup: true

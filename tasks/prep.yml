@@ -1,54 +1,129 @@
 ---
-# yamllint disable rule:line-length
 ###############################################################################
 # Prep
 ###############################################################################
-# Create user if needed and determine UID/GID for potential remote filesystems.
+# Stop services if existing. UID/GID required for multiple tags. Parse _cfg_
+# defaults to generate runtime data and store in data annotations.
 
-- name: 'Prep | fatal version mis-match'
-  when: >
-    _navidrome_srv_version_fatal_enable.raw and
-    _navidrome_srv_version.raw != navidrome_role_validate_version
-  ansible.builtin.fail:
-    msg: |
-      ╭───────────────────────────────────────────────────────────────────╮
-      │                                                                   │
-      │                     Fatal version mis-match.                      │
-      │                                                                   │
-      ├───────────────────────────────────────────────────────────────────╯
-      │ Navidrome version changes typically require manual migration steps
-      │ listed in release notes.
-      │
-      │ Reference:
-      │ * https://github.com/navidrome/navidrome/releases/tag/{{ _navidrome_srv_version.raw }}
-      │
-      │ navidrome_srv_version: {{ _navidrome_srv_version.raw }}
-      │ Supported version: {{ navidrome_role_validate_version }}
-      │ navidrome_srv_version_fatal_enable: {{ _navidrome_srv_version_fatal_enable.raw }}
+- name: 'Prep | fact | record start time'
+  ansible.builtin.set_fact:
+    navidrome__srv: "{{ {} | r_pufky.data.v3(
 
-- name: 'Prep | manage users'
-  when: _navidrome_srv_create_user.raw
-  ansible.builtin.include_role:
-    name: 'r_pufky.deb.users'
-    tasks_from: 'role_account_add.yml'
-  vars:
-    users_role_user: '{{ navidrome_role_user }}'
-    users_role_group: '{{ navidrome_role_group }}'
+        _version=navidrome_srv_version,
+        _token=navidrome_srv_token,
+        _user=navidrome_srv_user,
+        _group=navidrome_srv_group,
+      ) }}"
+    navidrome__cfg: "{{ {} | r_pufky.data.v3(
 
-- name: 'Prep | enumerate system user {{ _navidrome_srv_user.raw }}'
+        _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
+        _file=navidrome_cfg_file,
+        _backup_dir=navidrome_cfg_backup_dir | regex_replace('\\/$', ''),
+        _package=(
+          'navidrome_' ~ navidrome_srv_version.split('v')[-1] ~
+          '_linux_amd64.deb'
+        ),
+        _url=(
+          navidrome___repo_url ~ navidrome_srv_version ~ '/' ~
+          'navidrome_' ~ navidrome_srv_version.split('v')[-1] ~
+          '_linux_amd64.deb'
+        ),
+      ) }}"
+
+- name: 'Prep | assert | backup enabled and location defined'
+  when: navidrome_flg_backup
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - navidrome__cfg._backup_dir | length > 0
+    fail_msg: |
+
+      ✘ Backup location not set.
+      Backups enabled but no backup location defined.
+
+      navidrome_flg_backup: {{ navidrome_flg_backup }}
+      navidrome_cfg_backup_dir: {{ navidrome__cfg._backup_dir }}
+
+- name: 'Prep | assert | config enabled and source defined'
+  when: navidrome_flg_config
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - navidrome__cfg._file | length > 0
+    fail_msg: |
+
+      ✘ Config source not set.
+      Config source enabled but no config source defined.
+
+      navidrome_flg_config: {{ navidrome_flg_config }}
+      navidrome_cfg_file: {{ navidrome__cfg._file }}
+
+- name: 'Prep | assert | restore enabled and source defined'
+  when: navidrome_flg_restore
+  ansible.builtin.assert:
+    quiet: true
+    that:
+      - navidrome__cfg._file | length > 0
+    fail_msg: |
+
+      ✘ Config source not set.
+      Restore enabled but no config source defined.
+
+      navidrome_flg_restore: {{ navidrome_flg_restore }}
+      navidrome_cfg_file: {{ navidrome__cfg._file }}
+
+- name: 'Prep | systemd | stop services'
+  ansible.builtin.systemd:
+    name: 'navidrome.service'
+    state: 'stopped'
+  failed_when: false
+
+- name: '{{ "Prep | account | query user " ~ navidrome__srv._user }}'
+  ansible.builtin.command: '{{ "id " ~ navidrome__srv._user }}'
+  failed_when: false
+  register: navidrome__cfg_check
+  changed_when: navidrome__cfg_check.rc > 0
+
+- name: '{{ "Prep | account | query group " ~ navidrome__srv._group }}'
+  ansible.builtin.command: '{{ "groups " ~ navidrome__srv._group }}'
+  failed_when: false
+  register: navidrome__group_check
+  changed_when: navidrome__group_check.rc > 0
+
+- name: '{{ "Prep | account | create group " ~ navidrome__srv._group }}'
+  when: navidrome__group_check.rc != 0
+  ansible.builtin.group:
+    gid: '{{ navidrome___group.gid }}'
+    name: '{{ navidrome___group.name }}'
+    state: 'present'
+
+- name: '{{ "Prep | account | create user " ~ navidrome__srv._user }}'
+  when: navidrome__cfg_check.rc != 0
   ansible.builtin.user:
-    name: '{{ _navidrome_srv_user.raw }}'
+    name: '{{ navidrome___user.name }}'
+    group: '{{ navidrome___user.group }}'
+    uid: '{{ navidrome___user.uid }}'
+    shell: '{{ navidrome___user.shell }}'
+    home: '{{ navidrome___user.home }}'
+    create_home: '{{ navidrome___user.create_home }}'
+    password: '{{ navidrome___user.password }}'
+    password_lock: '{{ navidrome___user.password_lock }}'
+    update_password: '{{ navidrome___user.update_password }}'
+    expires: '{{ navidrome___user.expires }}'
+    system: '{{ navidrome___user.system }}'
+
+# Pre-existing users may have a different UID/GID/Home.
+- name: '{{ "Prep | account | enumerate " ~ navidrome__srv._user }}'
+  ansible.builtin.user:
+    name: '{{ navidrome__srv._user }}'
   check_mode: true
   changed_when: false
-  register: _navidrome_srv_user_query
+  register: navidrome__cfg_query
 
-- name: 'Prep | parse system user UID/GID'
+- name: 'Prep | fact | parse service UID/GID'
   ansible.builtin.set_fact:
-    _navidrome_srv_user: '{{
-        _navidrome_srv_user |
-        combine({"_uid": _navidrome_srv_user_query.uid})
-      }}'
-    _navidrome_srv_group: '{{
-        _navidrome_srv_group |
-        combine({"_gid": _navidrome_srv_user_query.group})
-      }}'
+    navidrome__cfg: "{{ navidrome__cfg | r_pufky.data.v3(
+
+        _uid=navidrome__cfg_query.uid,
+        _gid=navidrome__cfg_query.group,
+      ) }}"

@@ -1,0 +1,55 @@
+---
+###############################################################################
+# Backup
+###############################################################################
+# Only backup SQLite databases and configuration file.
+
+- name: 'Backup | filesystem | set backup location'
+  when: >
+    navidrome__cfg._backup_dir | length > 0 and
+    navidrome__cfg._backup_dir != '/tmp'
+  delegate_to: 'localhost'
+  run_once: true
+  ansible.builtin.file:
+    path: '{{ navidrome__cfg._backup_dir }}'
+    mode: '0750'
+    state: directory
+
+- name: 'Backup | fetch | navidrome.toml'
+  ansible.builtin.fetch:
+    src: '{{ navidrome___app._cfg }}'
+    dest: '{{
+        navidrome__cfg._backup_dir ~ "/" ~
+        navidrome__cfg._start ~ "_navidrome.toml"
+      }}'
+    fail_on_missing: false
+    flat: true
+
+# See services.yml for awk explanation.
+- name: 'Backup | awk | DataFolder'
+  ansible.builtin.shell: >-
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
+  args:
+    executable: '/bin/bash'
+  changed_when: false
+  register: navidrome__awk_data
+
+- name: 'Backup | fetch | databases'
+  ansible.builtin.fetch:
+    src: '{{ navidrome__awk_data.stdout ~ "/" ~ item }}'
+    dest: '{{
+        navidrome__cfg._backup_dir ~ "/" ~
+        navidrome__cfg._start ~ "_" ~ item
+      }}'
+    fail_on_missing: false
+    flat: true
+  loop:
+    - 'navidrome.db'
+    - 'navidrome.db-shm'
+    - 'navidrome.db-wal'
+
+- name: 'Backup | include | start.yml'
+  ansible.builtin.import_tasks: 'start.yml'
+
+- name: 'Backup | success ✔'
+  ansible.builtin.meta: 'end_host'
