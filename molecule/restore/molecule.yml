@@ -26,7 +26,7 @@ provisioner:
     group_vars:
       all:
         url_inject_enable: true
-        navidrome_cfg_backup_dir: '/tmp'
+        navidrome_cfg_backup_dir: '/tmp/ansible_navidrome_test'
 platforms:
   - name: 'navidrome_restore'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
