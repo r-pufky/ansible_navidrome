@@ -47,12 +47,3 @@
     owner: 'root'
     group: 'root'
     mode: '0644'
-
-- name: 'Services | systemd | daemon reload'
-  ansible.builtin.systemd:
-    daemon_reload: true
-
-- name: 'Services | systemd | enable'
-  ansible.builtin.systemd:
-    name: 'navidrome.service'
-    enabled: true

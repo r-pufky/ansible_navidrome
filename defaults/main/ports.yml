@@ -7,7 +7,7 @@
 # Reference:
 # * https://github.com/r-pufky/ansible_ufw
 
-navidrome_srv_ports:
+navidrome_ports:
   - proto: 'tcp'
     from_ip: 'any'
     to_port: 4533

@@ -10,20 +10,20 @@
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
           }}'
 
-    - name: 'Prepare | create cache'
+    - name: 'Prepare | cache'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'create_cache.yml'
       vars:
         test_name: 'Prepare cache'
 
-    - name: '{{  "Prepare | cache Navidrome " ~ navidrome___app._version }}'
+    - name: '{{  "Prepare | cache | Navidrome " ~ navidrome___app._version }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'cache_url.yml'
       vars:
         test_name:
-          '{{  "Prepare | cache Navidrome " ~ navidrome___app._version }}'
+          '{{  "Prepare | cache | Navidrome " ~ navidrome___app._version }}'
         test_dest: '{{ navidrome___app._package }}'
         test_url: '{{ navidrome___app._url }}'
         test_mode: '0640'
@@ -38,23 +38,21 @@
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
           }}'
 
-    - name: 'Prepare | inject cached packages'
+    - name: 'Prepare | inject | cached packages'
       when: (url_inject_enable | default(false))
       ansible.builtin.copy:
         src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/molecule/cache/" ~
-            item
+            navidrome___app._package
           }}'
-        dest: '{{ "/tmp/" ~ item }}'
+        dest: '{{ "/tmp/" ~ navidrome___app._package }}'
         owner: 'root'
         group: 'root'
         mode: '0644'
-      loop:
-        - '{{ navidrome___app._package }}'
 
     # Base install moving source builds to a 1-time process rather than
     # requiring rebuilds on re-tests. Re-running the same process in converge
     # should result in no change.
-    - name: 'Prepare | apply r_pufky.media.navidrome'
+    - name: 'Prepare | role | r_pufky.media.navidrome'
       ansible.builtin.include_role:
         name: 'r_pufky.media.navidrome'

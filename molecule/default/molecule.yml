@@ -27,7 +27,7 @@ provisioner:
       all:
         url_inject_enable: true
 platforms:
-  - name: 'navidrome_default'
+  - name: 'navidrome-default'
     image: 'ghcr.io/hifis-net/debian-systemd:13'
     systemd: 'always'
     capabilities:
@@ -40,10 +40,6 @@ platforms:
       - '4533:4533/tcp'
 verifier:
   name: 'ansible'
-lint: |
-  set -e
-  yamllint .
-  ansible-lint .
 scenario:
   test_sequence:
     - 'destroy'

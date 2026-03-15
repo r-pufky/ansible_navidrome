@@ -4,13 +4,16 @@
 ###############################################################################
 # Start Navidrome services and confirm they are active and running.
 
-- name: 'Start | systemd | start services'
+- name: 'Start | navidrome.service'
   ansible.builtin.systemd:
     name: 'navidrome.service'
     enabled: true
     daemon_reload: true
     state: 'started'
-  failed_when: false
+  delay: 15
+  retries: 3
+  register: navidrome__service
+  until: navidrome__service.status.ActiveState == 'active'
 
 - name: 'Start | fact | query services'
   ansible.builtin.service_facts:

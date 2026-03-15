@@ -15,9 +15,9 @@
   vars:
     apt_packages:
       - '{{ navidrome___packages }}'
-    apt_package_update_cache: true
+    apt_srv_package_update_cache: true
 
-- name: 'Install | filesystem | stage navidrome (~1 minute) 🗘'
+- name: 'Install | url | 🗘 navidrome (~1 minute) 🗘'
   when: not (url_inject_enable | default(false))
   ansible.builtin.get_url:
     url: '{{ navidrome__cfg._url }}'
@@ -31,13 +31,13 @@
   register: navidrome__cmd
   until: navidrome__cmd is succeeded
 
-- name: 'Install | apt | navidrome {{ navidrome__srv._version }}'
+- name: '{{ "Install | apt | navidrome " ~ navidrome__srv._version }}'
   ansible.builtin.apt:
     deb: '{{ "/tmp/" ~ navidrome__cfg._package }}'
     install_recommends: true
     state: 'present'
 
-- name: 'Prep | systemd | stop services'
+- name: 'Prep | systemd | stop navidrome.service'
   ansible.builtin.systemd:
     name: 'navidrome.service'
     state: 'stopped'

@@ -15,12 +15,12 @@
     mode: '0750'
     state: directory
 
-- name: 'Backup | fetch | navidrome.toml'
+- name: '{{ "Backup | fetch | " ~ navidrome___app._cfg }}'
   ansible.builtin.fetch:
     src: '{{ navidrome___app._cfg }}'
     dest: '{{
         navidrome__cfg._backup_dir ~ "/" ~
-        navidrome__cfg._start ~ "_navidrome.toml"
+        navidrome__srv._start ~ "_navidrome.toml"
       }}'
     fail_on_missing: false
     flat: true
@@ -39,7 +39,7 @@
     src: '{{ navidrome__awk_data.stdout ~ "/" ~ item }}'
     dest: '{{
         navidrome__cfg._backup_dir ~ "/" ~
-        navidrome__cfg._start ~ "_" ~ item
+        navidrome__srv._start ~ "_" ~ item
       }}'
     fail_on_missing: false
     flat: true
@@ -48,7 +48,7 @@
     - 'navidrome.db-shm'
     - 'navidrome.db-wal'
 
-- name: 'Backup | include | start.yml'
+- name: 'Backup | start'
   ansible.builtin.import_tasks: 'start.yml'
 
 - name: 'Backup | success ✔'

@@ -3,29 +3,35 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Verify | /etc/navidrome/navidrome.toml'
+    - name: 'Verify | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: '{{ "Verify | test | " ~ navidrome___app._cfg }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | /etc/navidrome/navidrome.toml'
+        test_name: '{{ "Verify | test | " ~ navidrome___app._cfg }}'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/navidrome.toml"
           }}'
-        test_file: '/etc/navidrome/navidrome.toml'
+        test_file: '{{ navidrome___app._cfg }}'
         test_owner: 'navidrome'
         test_group: 'navidrome'
         test_mode: '0640'
         test_state: 'file'
         test_diff: true
 
-    - name: 'Verify | /var/lib/navidrome/navidrome.db'
+    - name: 'Verify | test | /var/lib/navidrome/navidrome.db'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'file.yml'
       vars:
-        test_name: 'Verify | /var/lib/navidrome/navidrome.db'
+        test_name: 'Verify | test | /var/lib/navidrome/navidrome.db'
         test_file: '/var/lib/navidrome/navidrome.db'
         test_owner: 'navidrome'
         test_group: 'navidrome'

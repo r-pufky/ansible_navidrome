@@ -27,5 +27,4 @@
   ansible.builtin.import_tasks: 'services.yml'
 
 - name: 'Start'
-  when: navidrome_flg_start
   ansible.builtin.import_tasks: 'start.yml'

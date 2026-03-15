@@ -3,28 +3,34 @@
   hosts: 'all'
   gather_facts: false
   tasks:
-    - name: 'Converge | apply r_pufky.media.navidrome'
+    - name: 'Converge | import role variables'
+      ansible.builtin.include_vars:
+        file: '{{
+            lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~ "/vars/main.yml"
+          }}'
+
+    - name: 'Converge | role | r_pufky.media.navidrome'
       ansible.builtin.include_role:
         name: 'r_pufky.media.navidrome'
 
-    - name: 'Converge | verify | minimal /etc/navidrome/navidrome.toml'
+    - name: '{{ "Converge | test | minimal " ~ navidrome___app._cfg }}'
       ansible.builtin.include_role:
-        name: 'r_pufky.lib.tests'
+        name: 'r_pufky.data.test'
         tasks_from: 'copy.yml'
       vars:
-        test_name: 'Verify | minimal /etc/navidrome/navidrome.toml'
+        test_name: '{{ "Converge | test | minimal " ~ navidrome___app._cfg }}'
         test_src: '{{
             lookup("env", "MOLECULE_PROJECT_DIRECTORY") ~
             "/molecule/files/navidrome.toml.role_defaults"
           }}'
-        test_file: '/etc/navidrome/navidrome.toml'
+        test_file: '{{ navidrome___app._cfg }}'
         test_owner: 'navidrome'
         test_group: 'navidrome'
         test_mode: '0640'
         test_diff: true
 
     # Re-run with user test navidrome.toml.
-    - name: 'Converge | apply r_pufky.media.navidrome'
+    - name: 'Converge | role | r_pufky.media.navidrome'
       ansible.builtin.include_role:
         name: 'r_pufky.media.navidrome'
       vars:

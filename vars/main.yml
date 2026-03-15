@@ -1,6 +1,6 @@
 ---
 ###############################################################################
-# Default Navidrome Package Dependencies
+# Navidrome Role Options
 ###############################################################################
 # Navidrome is a single Golang binary.
 #
@@ -18,7 +18,7 @@
 
 navidrome___release: "{{ {} | r_pufky.data.v3(
 
-    _date='2025-10-15',
+    _date='2026-03-14',
     _debian='trixie',
     _app='v0.60.3',
   ) }}"

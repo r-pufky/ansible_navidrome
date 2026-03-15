@@ -7,7 +7,7 @@
 #
 # Backup existing config, DB, and exit role. Only applies to SQLite databases
 # configured in DataFolder. navidrome_cfg_backup_dir created if non-existent.
-# Services stopped for backup and restarted.
+# Services stopped, files backed up, services started.
 #
 # Default: False.
 navidrome_flg_backup: false
@@ -25,24 +25,23 @@ navidrome_flg_backup: false
 # **not** created. These must be created before executing restore (as with all
 # custom user data directories).
 #
-# Services are stopped, files restored, services updated, services restarted,
-# then validated.
+# Services stopped, files restored, services updated and started.
 #
 # Default: False.
 navidrome_flg_restore: false
 
 # 3. Run maintenance tasks?
 #
-# Preform role maintenance tasks including removal of old role versions. Does
-# not affect running services.
+# Preform role maintenance tasks including removal of old role versions.
 #
 # Default: True.
 navidrome_flg_maintenance: true
 
 # 4. Install application?
 #
-# Creates users, download and install release package, update services, and set
-# minimal navidrome.toml if not specified. Services stopped.
+# Creates required default directories, users, install packages, download
+# software, set minimal navidrome.toml if not specified, update and start
+# services.
 #
 # Default user runtime data is stored /var/lib/navidrome with default music
 # location set to /opt/navidrome/music. Alternative user defined locations for
@@ -54,17 +53,10 @@ navidrome_flg_install: true
 # 5. Set navidrome.toml?
 #
 # File set using navidrome_cfg_file. Stops service and deploys user
-# configuration, updates services. Services stopped.
+# configuration, updates and starts services.
 #
 # Default: False.
 navidrome_flg_config: false
-
-# 7. Verify service running?
-#
-# Start services after role application and verify running or fail.
-#
-# Default: True.
-navidrome_flg_start: true
 
 ###############################################################################
 # Service

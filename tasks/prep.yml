@@ -1,14 +1,15 @@
 ---
 ###############################################################################
-# Prep
+# Pre Execution Tasks
 ###############################################################################
-# Stop services if existing. UID/GID required for multiple tags. Parse _cfg_
-# defaults to generate runtime data and store in data annotations.
+# Only use data annotations in role after merging role, defaults, runtime data.
+# Stop services if existing. Resolve system UID/GID.
 
 - name: 'Prep | fact | record start time'
   ansible.builtin.set_fact:
     navidrome__srv: "{{ {} | r_pufky.data.v3(
 
+        _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
         _version=navidrome_srv_version,
         _token=navidrome_srv_token,
         _user=navidrome_srv_user,
@@ -16,7 +17,6 @@
       ) }}"
     navidrome__cfg: "{{ {} | r_pufky.data.v3(
 
-        _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
         _file=navidrome_cfg_file,
         _backup_dir=navidrome_cfg_backup_dir | regex_replace('\\/$', ''),
         _package=(
@@ -72,7 +72,7 @@
       navidrome_flg_restore: {{ navidrome_flg_restore }}
       navidrome_cfg_file: {{ navidrome__cfg._file }}
 
-- name: 'Prep | systemd | stop services'
+- name: 'Prep | systemd | stop navidrome.service'
   ansible.builtin.systemd:
     name: 'navidrome.service'
     state: 'stopped'
