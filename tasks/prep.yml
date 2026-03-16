@@ -15,7 +15,7 @@
         _user=navidrome_srv_user,
         _group=navidrome_srv_group,
       ) }}"
-    navidrome__cfg: "{{ {} | r_pufky.data.v3(
+    navidrome__cfg: "{{ navidrome___app | r_pufky.data.v3(
 
         _file=navidrome_cfg_file,
         _backup_dir=navidrome_cfg_backup_dir | regex_replace('\\/$', ''),

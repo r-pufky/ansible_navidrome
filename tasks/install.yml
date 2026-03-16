@@ -44,11 +44,11 @@
   failed_when: false
 
 - name:
-    '{{ "Install | filesystem | set minimal " ~ navidrome___app._cfg }}'
+    '{{ "Install | filesystem | set minimal " ~ navidrome__cfg._cfg }}'
   when: navidrome__cfg._file | length == 0
   ansible.builtin.template:
     src: 'navidrome.toml.j2'
-    dest: '{{ navidrome___app._cfg }}'
+    dest: '{{ navidrome__cfg._cfg }}'
     owner: '{{ navidrome__cfg._uid }}'
     group: '{{ navidrome__cfg._gid }}'
     mode: '0640'  # Originally 0644 w/ sensitive passwords.

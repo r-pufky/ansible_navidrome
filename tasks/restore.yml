@@ -18,7 +18,7 @@
 # See services.yml for awk explanation.
 - name: 'Restore | awk | DataFolder'
   ansible.builtin.shell: >-
-    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -29,7 +29,7 @@
     navidrome__cfg: "{{ navidrome__cfg | r_pufky.data.v3(
 
         _data_folder=navidrome__awk_data.stdout |
-        default(navidrome___app._var_dir),
+        default(navidrome__cfg._var_dir),
       ) }}"
 
 - name: 'Restore | filesystem | enumerate backups'

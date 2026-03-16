@@ -15,9 +15,9 @@
     mode: '0750'
     state: directory
 
-- name: '{{ "Backup | fetch | " ~ navidrome___app._cfg }}'
+- name: '{{ "Backup | fetch | " ~ navidrome__cfg._cfg }}'
   ansible.builtin.fetch:
-    src: '{{ navidrome___app._cfg }}'
+    src: '{{ navidrome__cfg._cfg }}'
     dest: '{{
         navidrome__cfg._backup_dir ~ "/" ~
         navidrome__srv._start ~ "_navidrome.toml"
@@ -28,7 +28,7 @@
 # See services.yml for awk explanation.
 - name: 'Backup | awk | DataFolder'
   ansible.builtin.shell: >-
-    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome__cfg._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false

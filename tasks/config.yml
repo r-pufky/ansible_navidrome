@@ -3,10 +3,10 @@
 # Configure Services
 ###############################################################################
 
-- name: '{{ "Config | filesystem | set " ~ navidrome___app._cfg }}'
+- name: '{{ "Config | filesystem | set " ~ navidrome__cfg._cfg }}'
   ansible.builtin.template:
     src: '{{ navidrome__cfg._file }}'
-    dest: '{{ navidrome___app._cfg }}'
+    dest: '{{ navidrome__cfg._cfg }}'
     owner: '{{ navidrome__cfg._uid }}'
     group: '{{ navidrome__cfg._gid }}'
     mode: '0640'  # Originally 0644 w/ sensitive passwords.
