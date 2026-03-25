@@ -73,7 +73,7 @@ navidrome_flg_config: false
 # * https://github.com/navidrome/navidrome/releases
 navidrome_srv_version: 'v0.60.3'
 
-# Github access token.
+# Github access token (navidrome).
 #
 # Unauthenticated (anonymous) API requests are heavily restricted to the sum
 # total of requests to github from a given IP. Use an access token if
