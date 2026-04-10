@@ -48,7 +48,7 @@ Once configured take a backup of configuration.
     name: 'r_pufky.media.navidrome'
   vars:
     navidrome_flg_backup: true
-    navidrome_cfg_backup_dir: 'host_vars/navi/data'
+    navidrome_cfg_backup_d: 'host_vars/navi/data'
 ```
 
 See [Existing Deployments](#existing-deployments) for reproducible
@@ -93,9 +93,9 @@ molecule test --all
 
 Testing variables:
 
-  Variable          | type | Description
- -------------------|------|-------------
-  url_inject_enable | bool | Disable **get_url** to inject files locally.
+  Variable            | Type | Description
+ ---------------------|------|-------------
+  molecule_flg_inject | bool | Disable **get_url** to inject files locally.
 
 ### [Releases][b]
 Focused on service deployment with templated configuration to minimize role
@@ -103,8 +103,8 @@ churn due to inconsistent and rapid rolling release cycle.
 
   Release | Debian | Ansible | Navidrome | Notes
  ---------|--------|---------|-----------|-------
-  4.x.x   | 13     | 2.20    | v0.60.3   | Update to Ansible 2.20 collection dependencies.
-  3.x.x   | 13     | 2.20    | v0.60.3   | Ansible 2.20, feature flags, and semantic versioning.
+  4.x.x   | 13     | 2.20    | v0.61.1   | Update to Ansible 2.20 collection dependencies.
+  3.x.x   | 13     | 2.20    | v0.61.1   | Ansible 2.20, feature flags, and semantic versioning.
   2.x.x   | 13     | 2.18    | v0.58.0   | Migrate to r_pufky.media.
   1.x.x   | 13     | 2.18    | v0.58.0   | Migration from private repository.
 

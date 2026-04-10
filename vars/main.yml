@@ -19,7 +19,7 @@ navidrome___release: "{{ {} | r_pufky.data.v3(
 
     _date='2026-03-14',
     _debian='trixie',
-    _app='v0.60.3',
+    _app='v0.61.1',
   ) }}"
 
 ###############################################################################
@@ -51,9 +51,8 @@ navidrome___app: "{{ {} | r_pufky.data.v3(
 
     _version=navidrome___release._app,
     _package=navidrome___package,
-    _opt_dir='/opt/navidrome',
-    _var_dir='/var/lib/navidrome',
-    _etc_dir='/etc/navidrome',
+    _opt_d='/opt/navidrome',
+    _var_d='/var/lib/navidrome',
     _cfg='/etc/navidrome/navidrome.toml',
     _drop_in='/etc/systemd/system/navidrome.service.d/override.conf',
     _base_url=navidrome___repo_url,

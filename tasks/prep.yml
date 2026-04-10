@@ -7,7 +7,7 @@
 
 - name: 'Prep | fact | record start time'
   ansible.builtin.set_fact:
-    navidrome__srv: "{{ {} | r_pufky.data.v3(
+    navidrome__srv: "{{ navidrome___release | r_pufky.data.v3(
 
         _start=now(utc=True, fmt='%Y-%m-%dT%H%M%S'),
         _version=navidrome_srv_version,
@@ -15,10 +15,10 @@
         _user=navidrome_srv_user,
         _group=navidrome_srv_group,
       ) }}"
-    navidrome__cfg: "{{ navidrome___app | r_pufky.data.v3(
+    navidrome__cfg: "{{ {} | r_pufky.data.v3(
 
         _file=navidrome_cfg_file,
-        _backup_dir=navidrome_cfg_backup_dir | regex_replace('\\/$', ''),
+        _backup_d=navidrome_cfg_backup_d | regex_replace('\\/$', ''),
         _package=(
           'navidrome_' ~ navidrome_srv_version.split('v')[-1] ~
           '_linux_amd64.deb'
@@ -35,14 +35,14 @@
   ansible.builtin.assert:
     quiet: true
     that:
-      - navidrome__cfg._backup_dir | length > 0
+      - navidrome__cfg._backup_d | length > 0
     fail_msg: |
 
       ✘ Backup location not set.
       Backups enabled but no backup location defined.
 
       navidrome_flg_backup: {{ navidrome_flg_backup }}
-      navidrome_cfg_backup_dir: {{ navidrome__cfg._backup_dir }}
+      navidrome_cfg_backup_d: {{ navidrome__cfg._backup_d }}
 
 - name: 'Prep | assert | config enabled and source defined'
   when: navidrome_flg_config

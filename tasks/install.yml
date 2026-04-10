@@ -18,7 +18,7 @@
     apt_srv_package_update_cache: true
 
 - name: 'Install | url | 🗘 navidrome (~1 minute) 🗘'
-  when: not (url_inject_enable | default(false))
+  when: not (molecule_flg_inject | default(false))
   ansible.builtin.get_url:
     url: '{{ navidrome__cfg._url }}'
     dest: '{{ "/tmp/" ~ navidrome__cfg._package }}'
@@ -44,11 +44,11 @@
   failed_when: false
 
 - name:
-    '{{ "Install | filesystem | set minimal " ~ navidrome__cfg._cfg }}'
+    '{{ "Install | filesystem | set minimal " ~ navidrome___app._cfg }}'
   when: navidrome__cfg._file | length == 0
   ansible.builtin.template:
     src: 'navidrome.toml.j2'
-    dest: '{{ navidrome__cfg._cfg }}'
+    dest: '{{ navidrome___app._cfg }}'
     owner: '{{ navidrome__cfg._uid }}'
     group: '{{ navidrome__cfg._gid }}'
     mode: '0640'  # Originally 0644 w/ sensitive passwords.

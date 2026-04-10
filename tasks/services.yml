@@ -16,7 +16,7 @@
 
 - name: 'Services | awk | DataFolder'
   ansible.builtin.shell: >-
-    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome__cfg._cfg }}
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -31,19 +31,19 @@
       ) }}"
 
 - name: '{{
-      "Services | systemd | create " ~ navidrome__cfg._drop_in | dirname
+      "Services | systemd | create " ~ navidrome___app._drop_in | dirname
     }}'
   ansible.builtin.file:
-    path: '{{ navidrome__cfg._drop_in | dirname }}'
+    path: '{{ navidrome___app._drop_in | dirname }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
     state: 'directory'
 
-- name: '{{ "Services | systemd | create " ~ navidrome__cfg._drop_in }}'
+- name: '{{ "Services | systemd | create " ~ navidrome___app._drop_in }}'
   ansible.builtin.template:
     src: 'systemd/override.conf.j2'
-    dest: '{{ navidrome__cfg._drop_in }}'
+    dest: '{{ navidrome___app._drop_in }}'
     owner: 'root'
     group: 'root'
     mode: '0644'

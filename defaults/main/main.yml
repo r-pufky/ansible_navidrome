@@ -3,10 +3,10 @@
 # Feature Flags
 ###############################################################################
 
-# 1. Backup SQLite, navidrome.toml to navidrome_cfg_backup_dir?
+# 1. Backup SQLite, navidrome.toml to navidrome_cfg_backup_d?
 #
 # Backup existing config, DB, and exit role. Only applies to SQLite databases
-# configured in DataFolder. navidrome_cfg_backup_dir created if non-existent.
+# configured in DataFolder. navidrome_cfg_backup_d created if non-existent.
 # Services stopped, files backed up, services started.
 #
 # Default: False.
@@ -20,7 +20,7 @@ navidrome_flg_backup: false
 # Configuration is applied via navidrome_cfg_file.
 #
 # Database (SQLite only):
-# Restored from latest backup in navidrome_cfg_backup_dir to
+# Restored from latest backup in navidrome_cfg_backup_d to
 # DataFolder in restored configuration file. Custom DataFolder paths are
 # **not** created. These must be created before executing restore (as with all
 # custom user data directories).
@@ -67,11 +67,11 @@ navidrome_flg_config: false
 # Navidrome upgrades generally require manual upgrade steps listed in release
 # notes. Submit an issue if future versions break role deployment.
 #
-# Default: 'v0.60.3'.
+# Default: 'v0.61.1'.
 #
 # Reference:
 # * https://github.com/navidrome/navidrome/releases
-navidrome_srv_version: 'v0.60.3'
+navidrome_srv_version: 'v0.61.1'
 
 # Github access token (navidrome).
 #
@@ -147,7 +147,7 @@ navidrome_cfg_file: ''
 # All backup operations for a given role execution are stored locally on
 # ansible controller with the format 'YYYY-MM-DDTHHMMSS_{FILE}'.
 #
-# navidrome_cfg_backup_dir: 'data/navi'
+# navidrome_cfg_backup_d: 'data/navi'
 #
 # Default: ''
-navidrome_cfg_backup_dir: ''
+navidrome_cfg_backup_d: ''

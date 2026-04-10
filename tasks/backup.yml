@@ -6,20 +6,20 @@
 
 - name: 'Backup | filesystem | set backup location'
   when: >
-    navidrome__cfg._backup_dir | length > 0 and
-    navidrome__cfg._backup_dir != '/tmp'
+    navidrome__cfg._backup_d | length > 0 and
+    navidrome__cfg._backup_d != '/tmp'
   delegate_to: 'localhost'
   run_once: true
   ansible.builtin.file:
-    path: '{{ navidrome__cfg._backup_dir }}'
+    path: '{{ navidrome__cfg._backup_d }}'
     mode: '0750'
     state: directory
 
-- name: '{{ "Backup | fetch | " ~ navidrome__cfg._cfg }}'
+- name: '{{ "Backup | fetch | " ~ navidrome___app._cfg }}'
   ansible.builtin.fetch:
-    src: '{{ navidrome__cfg._cfg }}'
+    src: '{{ navidrome___app._cfg }}'
     dest: '{{
-        navidrome__cfg._backup_dir ~ "/" ~
+        navidrome__cfg._backup_d ~ "/" ~
         navidrome__srv._start ~ "_navidrome.toml"
       }}'
     fail_on_missing: false
@@ -28,7 +28,7 @@
 # See services.yml for awk explanation.
 - name: 'Backup | awk | DataFolder'
   ansible.builtin.shell: >-
-    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome__cfg._cfg }}
+    awk -F'[ ="]+' '$1 == "DataFolder" { print $2 }' {{ navidrome___app._cfg }}
   args:
     executable: '/bin/bash'
   changed_when: false
@@ -38,7 +38,7 @@
   ansible.builtin.fetch:
     src: '{{ navidrome__awk_data.stdout ~ "/" ~ item }}'
     dest: '{{
-        navidrome__cfg._backup_dir ~ "/" ~
+        navidrome__cfg._backup_d ~ "/" ~
         navidrome__srv._start ~ "_" ~ item
       }}'
     fail_on_missing: false
