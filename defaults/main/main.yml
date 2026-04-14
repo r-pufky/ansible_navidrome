@@ -67,11 +67,11 @@ navidrome_flg_config: false
 # Navidrome upgrades generally require manual upgrade steps listed in release
 # notes. Submit an issue if future versions break role deployment.
 #
-# Default: 'v0.61.1'.
+# Default: 'v0.61.2'.
 #
 # Reference:
 # * https://github.com/navidrome/navidrome/releases
-navidrome_srv_version: 'v0.61.1'
+navidrome_srv_version: 'v0.61.2'
 
 # Github access token (navidrome).
 #
@@ -122,7 +122,7 @@ navidrome_srv_group: 'navidrome'
 # navidrome.toml to set.
 #
 # Ansible controller path to source navidrome.toml (treated as a jinja2
-# template allowing for ansible variable interpretation). Overwrites existing
+# template allowing for ansible variable use). Overwrites existing
 # /etc/navidrome/navidrome.toml.
 #
 # A minimally configured template that works with the role will be deployed if
