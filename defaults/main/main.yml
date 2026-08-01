@@ -67,11 +67,11 @@ navidrome_flg_config: false
 # Navidrome upgrades generally require manual upgrade steps listed in release
 # notes. Submit an issue if future versions break role deployment.
 #
-# Default: 'v0.61.2'.
+# Default: 'v0.63.2'.
 #
 # Reference:
 # * https://github.com/navidrome/navidrome/releases
-navidrome_srv_version: 'v0.61.2'
+navidrome_srv_version: 'v0.63.2'
 
 # Github access token (navidrome).
 #
